@@ -1,0 +1,5 @@
+# Optional cross-encoder reranker (bge-reranker-v2-m3). For CUDA builds of torch see
+# https://pytorch.org/get-started/locally/ (e.g. --index-url https://download.pytorch.org/whl/cu124)
+-r requirements.txt
+torch>=2.6
+sentence-transformers==6.1.0

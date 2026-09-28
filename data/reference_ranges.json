@@ -1,0 +1,1479 @@
+{
+ "_doc": [
+  "Public adult reference ranges (indicative screening intervals) for the canonical items in lab_synonyms.json.",
+  "low/high: numeric bounds in `unit` (null = one-sided). Bounds are inclusive unless low_exclusive/high_exclusive is true",
+  "(e.g. fasting glucose high=100 with high_exclusive: 100 itself is already abnormal).",
+  "sex_specific: {M: [lo, hi], F: [lo, hi]} overrides low/high when sex is known. qualitative_normal: expected qualitative result.",
+  "Reference ranges printed on the report take precedence. See reference_ranges.README.md."
+ ],
+ "version": 1,
+ "generated": "2026-09-25",
+ "items": [
+  {
+   "key": "bmi",
+   "zh": "身體質量指數",
+   "en": "BMI",
+   "unit": "kg/m2",
+   "low": 18.5,
+   "high": 24.0,
+   "high_exclusive": true,
+   "source": "國民健康署 成人健康體位標準 https://www.hpa.gov.tw/Pages/Detail.aspx?nodeid=542&pid=9737",
+   "note": "18.5 ≦ BMI < 24 為健康體位；24–27 過重，≧27 肥胖。上限為不含（high_exclusive）。"
+  },
+  {
+   "key": "body_fat_pct",
+   "zh": "體脂肪率",
+   "en": "Body fat %",
+   "unit": "%",
+   "low": null,
+   "high": null,
+   "sex_specific": {
+    "M": [
+     null,
+     25
+    ],
+    "F": [
+     null,
+     30
+    ]
+   },
+   "source": "國民健康署 衡量肥胖有哪些方法? https://www.hpa.gov.tw/Pages/Detail.aspx?nodeid=127&pid=7794",
+   "note": "國健署：30 歲以上男性 >25%、女性 >30% 視為肥胖；量測儀器（生物電阻）誤差大，僅供參考。"
+  },
+  {
+   "key": "waist",
+   "zh": "腰圍",
+   "en": "Waist",
+   "unit": "cm",
+   "low": null,
+   "high": null,
+   "high_exclusive": true,
+   "sex_specific": {
+    "M": [
+     null,
+     90
+    ],
+    "F": [
+     null,
+     80
+    ]
+   },
+   "source": "國民健康署 成人（20歲以上）代謝症候群之判定標準 https://www.hpa.gov.tw/Pages/Detail.aspx?nodeid=639&pid=1219",
+   "note": "男性 ≧90 cm、女性 ≧80 cm 為腹部肥胖（代謝症候群指標之一）；上限不含。"
+  },
+  {
+   "key": "pulse",
+   "zh": "脈搏",
+   "en": "Pulse",
+   "unit": "次/分",
+   "low": 60,
+   "high": 100,
+   "source": "MedlinePlus Pulse https://medlineplus.gov/ency/article/003399.htm",
+   "note": "成人靜止心率一般 60–100 次/分；規律運動者可低於 60 屬正常。"
+  },
+  {
+   "key": "sbp",
+   "zh": "收縮壓",
+   "en": "Systolic BP",
+   "unit": "mmHg",
+   "low": 90,
+   "high": 130,
+   "high_exclusive": true,
+   "source": "台灣心臟學會/台灣高血壓學會 2022 高血壓治療指引（高血壓定義 ≥130/80 mmHg）；國民健康署 高血壓專區 https://www.hpa.gov.tw/Pages/List.aspx?nodeid=1463",
+   "note": "2022 台灣指引：≧130/80 mmHg 即為高血壓（以居家血壓 722 原則為主）；<120/80 為理想，120–129 為血壓偏高。代謝症候群判定用 ≧130/85。<90 視為偏低。上限不含。"
+  },
+  {
+   "key": "dbp",
+   "zh": "舒張壓",
+   "en": "Diastolic BP",
+   "unit": "mmHg",
+   "low": 60,
+   "high": 80,
+   "high_exclusive": true,
+   "source": "台灣心臟學會/台灣高血壓學會 2022 高血壓治療指引（高血壓定義 ≥130/80 mmHg）；國民健康署 高血壓專區 https://www.hpa.gov.tw/Pages/List.aspx?nodeid=1463",
+   "note": "2022 台灣指引以 ≧80 mmHg 為高血壓；代謝症候群判定則用 ≧85 mmHg。上限不含。"
+  },
+  {
+   "key": "temperature",
+   "zh": "體溫",
+   "en": "Body temperature",
+   "unit": "°C",
+   "low": 36.0,
+   "high": 37.5,
+   "source": "MedlinePlus Body temperature norms https://medlineplus.gov/ency/article/001982.htm",
+   "note": "口溫/耳溫約 36–37.5 °C；≧38 °C 一般視為發燒。額溫、耳溫量測方式不同會有差異。"
+  },
+  {
+   "key": "wbc",
+   "zh": "白血球",
+   "en": "WBC",
+   "unit": "10^3/uL",
+   "low": 3.25,
+   "high": 9.16,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "臺大醫院區間；許多醫院採 4.0–10.0。"
+  },
+  {
+   "key": "rbc",
+   "zh": "紅血球",
+   "en": "RBC",
+   "unit": "10^6/uL",
+   "low": 3.78,
+   "high": 5.9,
+   "sex_specific": {
+    "M": [
+     4.21,
+     5.9
+    ],
+    "F": [
+     3.78,
+     5.25
+    ]
+   },
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "性別區間；low/high 為不分性別的最寬區間，應優先使用 sex_specific。"
+  },
+  {
+   "key": "hb",
+   "zh": "血色素",
+   "en": "Hemoglobin",
+   "unit": "g/dL",
+   "low": 12.0,
+   "high": 17.2,
+   "sex_specific": {
+    "M": [
+     13.0,
+     17.2
+    ],
+    "F": [
+     12.0,
+     15.2
+    ]
+   },
+   "source": "WHO Guideline on haemoglobin cutoffs to define anaemia (2024) https://www.who.int/publications/i/item/9789240088542 ；臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "下限採 WHO 貧血切點（非懷孕成人 男 <13、女 <12 g/dL），上限採臺大醫院區間。"
+  },
+  {
+   "key": "hct",
+   "zh": "紅血球容積比",
+   "en": "Hematocrit",
+   "unit": "%",
+   "low": 34.8,
+   "high": 51.5,
+   "sex_specific": {
+    "M": [
+     39.6,
+     51.5
+    ],
+    "F": [
+     34.8,
+     46.3
+    ]
+   },
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "性別區間。"
+  },
+  {
+   "key": "mcv",
+   "zh": "平均紅血球容積",
+   "en": "MCV",
+   "unit": "fL",
+   "low": 80,
+   "high": 100,
+   "source": "MedlinePlus CBC https://medlineplus.gov/ency/article/003642.htm ；臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "MCV <80 fL 為小球性（常見缺鐵或海洋性貧血），>100 為大球性。臺大醫院區間 80.9–99.3。"
+  },
+  {
+   "key": "mch",
+   "zh": "平均紅血球血色素量",
+   "en": "MCH",
+   "unit": "pg",
+   "low": 25.5,
+   "high": 33.2,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "臺大醫院區間；MedlinePlus 約 27–31 pg。"
+  },
+  {
+   "key": "mchc",
+   "zh": "平均紅血球血色素濃度",
+   "en": "MCHC",
+   "unit": "g/dL",
+   "low": 31.0,
+   "high": 34.9,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": ""
+  },
+  {
+   "key": "plt",
+   "zh": "血小板",
+   "en": "Platelet",
+   "unit": "10^3/uL",
+   "low": 150,
+   "high": 400,
+   "source": "MedlinePlus CBC https://medlineplus.gov/ency/article/003642.htm ；臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "常用 150–400；臺大醫院 150–378，MedlinePlus 150–450。"
+  },
+  {
+   "key": "rdw",
+   "zh": "紅血球分佈寬度",
+   "en": "RDW",
+   "unit": "%",
+   "low": 11.6,
+   "high": 15.0,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "RDW-CV。"
+  },
+  {
+   "key": "mpv",
+   "zh": "平均血小板體積",
+   "en": "MPV",
+   "unit": "fL",
+   "low": 7.5,
+   "high": 11.5,
+   "source": "Analyzer-dependent common interval（依儀器廠牌）",
+   "note": "各廠牌血球計數儀差異大，應以報告印製範圍為準（信心較低）。"
+  },
+  {
+   "key": "pct",
+   "zh": "血小板容積比",
+   "en": "Plateletcrit",
+   "unit": "%",
+   "low": 0.1,
+   "high": 0.4,
+   "source": "Analyzer-dependent common interval（依儀器廠牌）",
+   "note": "非常規判讀項目；區間依儀器而異（信心較低）。"
+  },
+  {
+   "key": "pdw",
+   "zh": "血小板分佈寬度",
+   "en": "PDW",
+   "unit": "%",
+   "low": 9.0,
+   "high": 17.0,
+   "source": "Analyzer-dependent common interval（依儀器廠牌）",
+   "note": "單位與數值依儀器（fL 或 %）差異很大，建議以報告範圍為準（信心較低）。"
+  },
+  {
+   "key": "eos_pct",
+   "zh": "嗜酸性白血球百分比",
+   "en": "Eosinophil %",
+   "unit": "%",
+   "low": 0,
+   "high": 7.9,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "臺大下限 0.3%，此處下限取 0（數值為 0 不具臨床意義）。"
+  },
+  {
+   "key": "baso_pct",
+   "zh": "嗜鹼性白血球百分比",
+   "en": "Basophil %",
+   "unit": "%",
+   "low": 0,
+   "high": 1.6,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "臺大下限 0.2%，此處下限取 0。"
+  },
+  {
+   "key": "mono_pct",
+   "zh": "單核球百分比",
+   "en": "Monocyte %",
+   "unit": "%",
+   "low": 3.3,
+   "high": 8.9,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "MedlinePlus 2–8%。"
+  },
+  {
+   "key": "lymph_pct",
+   "zh": "淋巴球百分比",
+   "en": "Lymphocyte %",
+   "unit": "%",
+   "low": 18.0,
+   "high": 48.8,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "MedlinePlus 20–40%。"
+  },
+  {
+   "key": "neut_pct",
+   "zh": "嗜中性球百分比",
+   "en": "Neutrophil %",
+   "unit": "%",
+   "low": 41.6,
+   "high": 74.4,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "MedlinePlus 40–60%。"
+  },
+  {
+   "key": "lymph_abs",
+   "zh": "淋巴球數",
+   "en": "Lymphocyte count",
+   "unit": "10^3/uL",
+   "low": 1.0,
+   "high": 4.8,
+   "source": "MedlinePlus Blood differential https://medlineplus.gov/ency/article/003657.htm；常用血液學切點",
+   "note": "<1.0 為淋巴球低下。"
+  },
+  {
+   "key": "mono_abs",
+   "zh": "單核球數",
+   "en": "Monocyte count",
+   "unit": "10^3/uL",
+   "low": 0.1,
+   "high": 1.0,
+   "source": "MedlinePlus Blood differential https://medlineplus.gov/ency/article/003657.htm；常用血液學切點",
+   "note": ">1.0 為單核球增多。"
+  },
+  {
+   "key": "eos_abs",
+   "zh": "嗜酸性白血球數",
+   "en": "Eosinophil count",
+   "unit": "10^3/uL",
+   "low": 0,
+   "high": 0.5,
+   "source": "MedlinePlus Blood differential https://medlineplus.gov/ency/article/003657.htm；常用血液學切點",
+   "note": ">0.5 為嗜酸性球增多（過敏、寄生蟲等）。"
+  },
+  {
+   "key": "baso_abs",
+   "zh": "嗜鹼性球數",
+   "en": "Basophil count",
+   "unit": "10^3/uL",
+   "low": 0,
+   "high": 0.2,
+   "source": "MedlinePlus Blood differential https://medlineplus.gov/ency/article/003657.htm；常用血液學切點",
+   "note": ""
+  },
+  {
+   "key": "neut_abs",
+   "zh": "嗜中性球數",
+   "en": "Neutrophil count",
+   "unit": "10^3/uL",
+   "low": 1.5,
+   "high": 7.5,
+   "source": "MedlinePlus Blood differential https://medlineplus.gov/ency/article/003657.htm；常用血液學切點",
+   "note": "ANC <1.5 ×10^3/µL 為嗜中性球低下。"
+  },
+  {
+   "key": "albumin",
+   "zh": "白蛋白",
+   "en": "Albumin",
+   "unit": "g/dL",
+   "low": 3.5,
+   "high": 5.7,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": ""
+  },
+  {
+   "key": "globulin",
+   "zh": "球蛋白",
+   "en": "Globulin",
+   "unit": "g/dL",
+   "low": 2.0,
+   "high": 3.5,
+   "source": "由總蛋白與白蛋白區間推得；常用成人區間 2.0–3.5 g/dL",
+   "note": "計算值（總蛋白 − 白蛋白）。"
+  },
+  {
+   "key": "total_protein",
+   "zh": "總蛋白",
+   "en": "Total protein",
+   "unit": "g/dL",
+   "low": 6.4,
+   "high": 8.9,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "MedlinePlus 6.5–8.1 g/dL。"
+  },
+  {
+   "key": "ast",
+   "zh": "天門冬胺酸轉胺酶",
+   "en": "AST (GOT)",
+   "unit": "U/L",
+   "low": 8,
+   "high": 31,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "臺大醫院區間；不少健檢單位採 ≦40 U/L，差異來自試劑方法。"
+  },
+  {
+   "key": "alt",
+   "zh": "丙胺酸轉胺酶",
+   "en": "ALT (GPT)",
+   "unit": "U/L",
+   "low": 0,
+   "high": 41,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "臺大醫院區間；不少單位採 ≦40 U/L。"
+  },
+  {
+   "key": "bil_total",
+   "zh": "總膽紅素",
+   "en": "Total bilirubin",
+   "unit": "mg/dL",
+   "low": 0.3,
+   "high": 1.0,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "他院常見上限 1.2–1.3 mg/dL；輕度單獨升高常見於吉爾伯特症候群。"
+  },
+  {
+   "key": "bil_direct",
+   "zh": "直接膽紅素",
+   "en": "Direct bilirubin",
+   "unit": "mg/dL",
+   "low": null,
+   "high": 0.2,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "臺大醫院 0.03–0.18，此處取上限 0.2。"
+  },
+  {
+   "key": "alp",
+   "zh": "鹼性磷酸酶",
+   "en": "ALP",
+   "unit": "U/L",
+   "low": 34,
+   "high": 104,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "青少年骨骼生長期可較高。"
+  },
+  {
+   "key": "ggt",
+   "zh": "γ-麩胺醯轉移酶",
+   "en": "γ-GT",
+   "unit": "U/L",
+   "low": 9,
+   "high": 64,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": ""
+  },
+  {
+   "key": "amylase",
+   "zh": "澱粉酶",
+   "en": "Amylase",
+   "unit": "U/L",
+   "low": 28,
+   "high": 100,
+   "source": "MedlinePlus Amylase blood test https://medlineplus.gov/ency/article/003464.htm；常見酵素法試劑區間",
+   "note": "MedlinePlus 列 40–140 U/L，但依方法不同；國內常見約 28–100 U/L（信心中等）。"
+  },
+  {
+   "key": "ag_ratio",
+   "zh": "白蛋白/球蛋白比",
+   "en": "A/G ratio",
+   "unit": "",
+   "low": 1.0,
+   "high": 2.2,
+   "source": "臨床常用區間（由白蛋白/球蛋白區間推得）",
+   "note": "計算值。"
+  },
+  {
+   "key": "bun",
+   "zh": "尿素氮",
+   "en": "BUN",
+   "unit": "mg/dL",
+   "low": 7,
+   "high": 25,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": ""
+  },
+  {
+   "key": "creatinine",
+   "zh": "肌酸酐",
+   "en": "Creatinine",
+   "unit": "mg/dL",
+   "low": 0.6,
+   "high": 1.3,
+   "sex_specific": {
+    "M": [
+     0.7,
+     1.3
+    ],
+    "F": [
+     0.6,
+     1.1
+    ]
+   },
+   "source": "MedlinePlus Creatinine blood test https://medlineplus.gov/ency/article/003475.htm ；臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "MedlinePlus：男 0.7–1.3、女 0.6–1.1 mg/dL；臺大醫院不分性別 0.6–1.3。"
+  },
+  {
+   "key": "uric_acid",
+   "zh": "尿酸",
+   "en": "Uric acid",
+   "unit": "mg/dL",
+   "low": 2.3,
+   "high": 7.6,
+   "sex_specific": {
+    "M": [
+     4.4,
+     7.6
+    ],
+    "F": [
+     2.3,
+     6.6
+    ]
+   },
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "臺大醫院性別區間；風濕病醫學界常以 >7.0 mg/dL（尿酸鹽溶解度）定義高尿酸血症。"
+  },
+  {
+   "key": "egfr",
+   "zh": "腎絲球過濾率",
+   "en": "eGFR",
+   "unit": "mL/min/1.73m2",
+   "low": 60,
+   "high": null,
+   "source": "KDIGO CKD Guideline https://kdigo.org/guidelines/ckd-evaluation-and-management/ ；國民健康署 腎臟病專區 https://www.hpa.gov.tw/Pages/List.aspx?nodeid=217",
+   "note": "<60 持續 3 個月以上即符合慢性腎臟病（G3 以上）；60–89 為輕度下降，需搭配尿蛋白判斷；≧90 為正常。"
+  },
+  {
+   "key": "chol",
+   "zh": "總膽固醇",
+   "en": "Total cholesterol",
+   "unit": "mg/dL",
+   "low": null,
+   "high": 200,
+   "high_exclusive": true,
+   "source": "國民健康署 三高防治專區 https://www.hpa.gov.tw/Pages/List.aspx?nodeid=223 ；臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "≧200 mg/dL 為偏高。上限不含。"
+  },
+  {
+   "key": "tg",
+   "zh": "三酸甘油脂",
+   "en": "Triglyceride",
+   "unit": "mg/dL",
+   "low": null,
+   "high": 150,
+   "high_exclusive": true,
+   "source": "國民健康署 成人（20歲以上）代謝症候群之判定標準 https://www.hpa.gov.tw/Pages/Detail.aspx?nodeid=639&pid=1219 ；臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "≧150 mg/dL 為偏高（代謝症候群指標）。上限不含。"
+  },
+  {
+   "key": "hdl",
+   "zh": "高密度脂蛋白膽固醇",
+   "en": "HDL-C",
+   "unit": "mg/dL",
+   "low": 40,
+   "high": null,
+   "sex_specific": {
+    "M": [
+     40,
+     null
+    ],
+    "F": [
+     50,
+     null
+    ]
+   },
+   "source": "國民健康署 成人（20歲以上）代謝症候群之判定標準 https://www.hpa.gov.tw/Pages/Detail.aspx?nodeid=639&pid=1219",
+   "note": "男 <40、女 <50 mg/dL 為偏低（代謝症候群指標）。"
+  },
+  {
+   "key": "ldl",
+   "zh": "低密度脂蛋白膽固醇",
+   "en": "LDL-C",
+   "unit": "mg/dL",
+   "low": null,
+   "high": 130,
+   "high_exclusive": true,
+   "source": "國民健康署 三高防治專區 https://www.hpa.gov.tw/Pages/List.aspx?nodeid=223 ；臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "≧130 mg/dL 為偏高；有心血管疾病、糖尿病等高風險者之目標值更低，依醫師評估。上限不含。"
+  },
+  {
+   "key": "chol_hdl_ratio",
+   "zh": "總膽固醇/高密度膽固醇比",
+   "en": "TC/HDL ratio",
+   "unit": "",
+   "low": null,
+   "high": 5.0,
+   "source": "臨床常用風險比值（Framingham 相關研究；<5 為一般目標，<3.5 較理想）",
+   "note": "非診斷標準，信心中等。"
+  },
+  {
+   "key": "ldl_hdl_ratio",
+   "zh": "低密度/高密度膽固醇比",
+   "en": "LDL/HDL ratio",
+   "unit": "",
+   "low": null,
+   "high": 3.5,
+   "source": "臨床常用風險比值（一般以 <3.5 為目標）",
+   "note": "非診斷標準，信心中等。"
+  },
+  {
+   "key": "risk_factor",
+   "zh": "動脈硬化指數",
+   "en": "Atherogenic risk factor",
+   "unit": "",
+   "low": null,
+   "high": 5.0,
+   "source": "臨床常用（多數報告以 TC/HDL 計算，<5 為目標）",
+   "note": "各報告定義不一（TC/HDL 或 LDL/HDL），以報告範圍為準；信心較低。"
+  },
+  {
+   "key": "glucose_ac",
+   "zh": "飯前血糖",
+   "en": "Fasting glucose",
+   "unit": "mg/dL",
+   "low": 70,
+   "high": 100,
+   "high_exclusive": true,
+   "source": "中華民國糖尿病學會 糖尿病臨床照護指引／ADA Standards of Care（空腹血糖 100–125、HbA1c 5.7–6.4% 為糖尿病前期）；國民健康署 糖尿病專區 https://www.hpa.gov.tw/Pages/List.aspx?nodeid=359 ；臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "空腹 100–125 為空腹血糖偏高（糖尿病前期），≧126（重複確認）為糖尿病。上限不含。"
+  },
+  {
+   "key": "hba1c",
+   "zh": "糖化血色素",
+   "en": "HbA1c",
+   "unit": "%",
+   "low": null,
+   "high": 5.7,
+   "high_exclusive": true,
+   "source": "中華民國糖尿病學會 糖尿病臨床照護指引／ADA Standards of Care（空腹血糖 100–125、HbA1c 5.7–6.4% 為糖尿病前期）；國民健康署 糖尿病專區 https://www.hpa.gov.tw/Pages/List.aspx?nodeid=359",
+   "note": "5.7–6.4% 為糖尿病前期，≧6.5% 為糖尿病；臺大醫院實驗室區間 4.0–6.0%。上限不含。"
+  },
+  {
+   "key": "afp",
+   "zh": "甲型胎兒蛋白",
+   "en": "AFP",
+   "unit": "ng/mL",
+   "low": null,
+   "high": 20,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm ；NCI Tumor Markers fact sheet https://www.cancer.gov/about-cancer/diagnosis-staging/diagnosis/tumor-markers-fact-sheet",
+   "note": "腫瘤標記為輔助參考，非癌症診斷依據；良性狀況亦可能升高。臺大醫院 <20；部分實驗室採 <10。"
+  },
+  {
+   "key": "cea",
+   "zh": "癌胚抗原",
+   "en": "CEA",
+   "unit": "ng/mL",
+   "low": null,
+   "high": 5.0,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm ；NCI Tumor Markers fact sheet https://www.cancer.gov/about-cancer/diagnosis-staging/diagnosis/tumor-markers-fact-sheet",
+   "note": "腫瘤標記為輔助參考，非癌症診斷依據；良性狀況亦可能升高。吸菸者可略高。"
+  },
+  {
+   "key": "ca199",
+   "zh": "CA19-9 胰臟癌指標",
+   "en": "CA19-9",
+   "unit": "U/mL",
+   "low": null,
+   "high": 37,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm ；NCI Tumor Markers fact sheet https://www.cancer.gov/about-cancer/diagnosis-staging/diagnosis/tumor-markers-fact-sheet",
+   "note": "腫瘤標記為輔助參考，非癌症診斷依據；良性狀況亦可能升高。"
+  },
+  {
+   "key": "ca125",
+   "zh": "CA-125 卵巢癌指標",
+   "en": "CA-125",
+   "unit": "U/mL",
+   "low": null,
+   "high": 35,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm ；NCI Tumor Markers fact sheet https://www.cancer.gov/about-cancer/diagnosis-staging/diagnosis/tumor-markers-fact-sheet",
+   "note": "腫瘤標記為輔助參考，非癌症診斷依據；良性狀況亦可能升高。月經期、子宮內膜異位症可升高。"
+  },
+  {
+   "key": "ca153",
+   "zh": "CA-153 乳癌指標",
+   "en": "CA15-3",
+   "unit": "U/mL",
+   "low": null,
+   "high": 30,
+   "source": "Medscape CA 15-3 Reference Range https://emedicine.medscape.com/article/2087491-overview ；NCI Tumor Markers fact sheet https://www.cancer.gov/about-cancer/diagnosis-staging/diagnosis/tumor-markers-fact-sheet",
+   "note": "腫瘤標記為輔助參考，非癌症診斷依據；良性狀況亦可能升高。常見上限 25–31 U/mL（依試劑）；信心中等。"
+  },
+  {
+   "key": "psa",
+   "zh": "攝護腺特異抗原",
+   "en": "PSA",
+   "unit": "ng/mL",
+   "low": null,
+   "high": 4.0,
+   "sex_specific": {
+    "M": [
+     null,
+     4.0
+    ],
+    "F": [
+     null,
+     null
+    ]
+   },
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "臺大醫院採年齡別：40–49 <2.5、50–59 <3.5、60–69 <4.5、70–79 <6.5；此處取常用 4.0。僅適用男性。"
+  },
+  {
+   "key": "ebv_iga",
+   "zh": "鼻咽癌篩檢 EBV-IgA",
+   "en": "EBV-IgA",
+   "unit": "",
+   "low": null,
+   "high": null,
+   "qualitative_normal": "陰性",
+   "source": "依試劑判定反應性（EBV VCA-IgA / EBNA1-IgA）；NCI Tumor Markers fact sheet https://www.cancer.gov/about-cancer/diagnosis-staging/diagnosis/tumor-markers-fact-sheet",
+   "note": "數值切點依試劑而異，以報告判讀為準。"
+  },
+  {
+   "key": "cyfra",
+   "zh": "CYFRA 21-1 肺癌指標",
+   "en": "CYFRA 21-1",
+   "unit": "ng/mL",
+   "low": null,
+   "high": 3.3,
+   "source": "常用電化學冷光試劑切點；NCI Tumor Markers fact sheet https://www.cancer.gov/about-cancer/diagnosis-staging/diagnosis/tumor-markers-fact-sheet",
+   "note": "腫瘤標記為輔助參考，非癌症診斷依據；良性狀況亦可能升高。信心較低。"
+  },
+  {
+   "key": "nse",
+   "zh": "NSE 小細胞肺癌指標",
+   "en": "NSE",
+   "unit": "ng/mL",
+   "low": null,
+   "high": 16.3,
+   "source": "常用電化學冷光試劑切點；NCI Tumor Markers fact sheet https://www.cancer.gov/about-cancer/diagnosis-staging/diagnosis/tumor-markers-fact-sheet",
+   "note": "腫瘤標記為輔助參考，非癌症診斷依據；良性狀況亦可能升高。溶血會使數值假性升高；信心中等。"
+  },
+  {
+   "key": "hs_crp",
+   "zh": "高敏感度C反應蛋白",
+   "en": "hs-CRP",
+   "unit": "mg/dL",
+   "low": null,
+   "high": 0.3,
+   "source": "MedlinePlus C-reactive protein https://medlineplus.gov/ency/article/003356.htm",
+   "note": "心血管風險：<0.1 mg/dL(1 mg/L) 低、0.1–0.3 中、>0.3 mg/dL(3 mg/L) 高；急性感染時不適用風險判讀。"
+  },
+  {
+   "key": "crp",
+   "zh": "C反應蛋白",
+   "en": "CRP",
+   "unit": "mg/dL",
+   "low": null,
+   "high": 1.0,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm ；MedlinePlus C-reactive protein https://medlineplus.gov/ency/article/003356.htm",
+   "note": "MedlinePlus 指多數健康成人 <0.3 mg/dL；臺大醫院列 <1。"
+  },
+  {
+   "key": "insulin",
+   "zh": "胰島素",
+   "en": "Insulin",
+   "unit": "uIU/mL",
+   "low": null,
+   "high": 28.8,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "空腹胰島素；區間依試劑而異。"
+  },
+  {
+   "key": "homa_ir",
+   "zh": "胰島素阻抗指數",
+   "en": "HOMA-IR",
+   "unit": "",
+   "low": null,
+   "high": 2.5,
+   "source": "Matthews et al., Diabetologia 1985（HOMA 模型）；切點依族群研究約 2.0–2.7",
+   "note": "無統一標準，此處採常用 2.5；信心較低。"
+  },
+  {
+   "key": "homocysteine",
+   "zh": "同半胱胺酸",
+   "en": "Homocysteine",
+   "unit": "umol/L",
+   "low": null,
+   "high": 15,
+   "source": "MedlinePlus Homocysteine Test https://medlineplus.gov/lab-tests/homocysteine-test/ ；常用切點 >15 µmol/L 為偏高",
+   "note": ""
+  },
+  {
+   "key": "hbsag",
+   "zh": "B型肝炎表面抗原",
+   "en": "HBsAg",
+   "unit": "COI",
+   "low": null,
+   "high": 1.0,
+   "high_exclusive": true,
+   "qualitative_normal": "陰性",
+   "source": "CDC Hepatitis B serology (anti-HBs ≥10 mIU/mL = immune) https://www.cdc.gov/hepatitis-b/",
+   "note": "COI <1.0 為陰性（依試劑）。"
+  },
+  {
+   "key": "anti_hbs",
+   "zh": "B型肝炎表面抗體",
+   "en": "Anti-HBs",
+   "unit": "mIU/mL",
+   "low": 10,
+   "high": null,
+   "source": "CDC Hepatitis B serology (anti-HBs ≥10 mIU/mL = immune) https://www.cdc.gov/hepatitis-b/",
+   "note": "≧10 mIU/mL 表示具保護力；低於此值非疾病，可與醫師討論是否補接種。"
+  },
+  {
+   "key": "hbeag",
+   "zh": "B型肝炎e抗原",
+   "en": "HBeAg",
+   "unit": "",
+   "low": null,
+   "high": 1.0,
+   "high_exclusive": true,
+   "qualitative_normal": "陰性",
+   "source": "CDC Hepatitis B serology (anti-HBs ≥10 mIU/mL = immune) https://www.cdc.gov/hepatitis-b/",
+   "note": "COI <1.0 為陰性。"
+  },
+  {
+   "key": "anti_hcv",
+   "zh": "C型肝炎抗體",
+   "en": "Anti-HCV",
+   "unit": "COI",
+   "low": null,
+   "high": 1.0,
+   "high_exclusive": true,
+   "qualitative_normal": "陰性",
+   "source": "CDC Hepatitis C testing https://www.cdc.gov/hepatitis-c/",
+   "note": "陽性需再做 HCV RNA 確認是否為現行感染。"
+  },
+  {
+   "key": "rf",
+   "zh": "類風濕性關節炎因子",
+   "en": "Rheumatoid factor",
+   "unit": "IU/mL",
+   "low": null,
+   "high": 15,
+   "source": "MedlinePlus Rheumatoid factor https://medlineplus.gov/ency/article/003548.htm",
+   "note": "部分試劑用 <14。"
+  },
+  {
+   "key": "hpv_rlu",
+   "zh": "人類乳突病毒 HPV DNA",
+   "en": "HPV DNA",
+   "unit": "RLU/Cutoff",
+   "low": null,
+   "high": 1.0,
+   "high_exclusive": true,
+   "qualitative_normal": "陰性",
+   "source": "NCI HPV and Cancer https://www.cancer.gov/about-cancer/causes-prevention/risk/infectious-agents/hpv-and-cancer",
+   "note": "Hybrid Capture 類檢測以 RLU/CO ≧1.0 為陽性。"
+  },
+  {
+   "key": "hpv_result",
+   "zh": "人類乳突病毒 HPV DNA 結果",
+   "en": "HPV DNA result",
+   "unit": "",
+   "low": null,
+   "high": null,
+   "qualitative_normal": "陰性",
+   "source": "NCI HPV and Cancer https://www.cancer.gov/about-cancer/causes-prevention/risk/infectious-agents/hpv-and-cancer",
+   "note": ""
+  },
+  {
+   "key": "hpv_highrisk",
+   "zh": "HPV 高危險型別",
+   "en": "HPV high-risk genotypes",
+   "unit": "",
+   "low": null,
+   "high": null,
+   "qualitative_normal": "陰性",
+   "source": "NCI HPV and Cancer https://www.cancer.gov/about-cancer/causes-prevention/risk/infectious-agents/hpv-and-cancer",
+   "note": ""
+  },
+  {
+   "key": "h_pylori_ubt",
+   "zh": "幽門桿菌碳13呼氣檢查",
+   "en": "H. pylori urea breath test",
+   "unit": "",
+   "low": null,
+   "high": null,
+   "qualitative_normal": "陰性",
+   "source": "MedlinePlus Helicobacter pylori tests https://medlineplus.gov/lab-tests/helicobacter-pylori-h-pylori-tests/",
+   "note": "數值切點依試劑（常見 DOB 約 4‰）。"
+  },
+  {
+   "key": "h_pylori_clo",
+   "zh": "幽門桿菌尿素酶試驗 (CLO)",
+   "en": "H. pylori CLO test",
+   "unit": "",
+   "low": null,
+   "high": null,
+   "qualitative_normal": "陰性",
+   "source": "MedlinePlus Helicobacter pylori tests https://medlineplus.gov/lab-tests/helicobacter-pylori-h-pylori-tests/",
+   "note": ""
+  },
+  {
+   "key": "fobt",
+   "zh": "糞便潛血",
+   "en": "Fecal occult blood (FIT)",
+   "unit": "ng/mL",
+   "low": null,
+   "high": 100,
+   "high_exclusive": true,
+   "qualitative_normal": "陰性",
+   "source": "國民健康署 大腸癌篩檢簡介 https://www.hpa.gov.tw/Pages/Detail.aspx?nodeid=621&pid=1136",
+   "note": "國內定量免疫法多以 100 ng/mL 為陽性切點（依試劑略異）；陽性應安排大腸鏡。"
+  },
+  {
+   "key": "t3",
+   "zh": "三碘甲狀腺素",
+   "en": "T3",
+   "unit": "ng/dL",
+   "low": 78,
+   "high": 182,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "MedlinePlus 78–158 ng/dL。"
+  },
+  {
+   "key": "free_t3",
+   "zh": "游離三碘甲狀腺素",
+   "en": "Free T3",
+   "unit": "pg/mL",
+   "low": 2.1,
+   "high": 4.4,
+   "source": "MedlinePlus T3 test https://medlineplus.gov/ency/article/003687.htm",
+   "note": "MedlinePlus 210–440 pg/dL。"
+  },
+  {
+   "key": "free_t4",
+   "zh": "游離甲狀腺素",
+   "en": "Free T4",
+   "unit": "ng/dL",
+   "low": 0.89,
+   "high": 1.79,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "臺大醫院（RIA 法）；CIA 法 0.7–1.48。"
+  },
+  {
+   "key": "t4",
+   "zh": "四碘甲狀腺素",
+   "en": "T4",
+   "unit": "ug/dL",
+   "low": 4.6,
+   "high": 12.4,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": ""
+  },
+  {
+   "key": "tsh",
+   "zh": "甲狀腺刺激素",
+   "en": "TSH",
+   "unit": "uIU/mL",
+   "low": 0.17,
+   "high": 4.05,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "臺大醫院區間；他院常見 0.27–4.2 或 0.4–4.0。"
+  },
+  {
+   "key": "fsh",
+   "zh": "濾泡刺激素",
+   "en": "FSH",
+   "unit": "mIU/mL",
+   "low": null,
+   "high": null,
+   "sex_specific": {
+    "M": [
+     1.5,
+     12.4
+    ],
+    "F": [
+     4.7,
+     21.5
+    ]
+   },
+   "source": "MedlinePlus FSH blood test https://medlineplus.gov/ency/article/003710.htm",
+   "note": "女性依月經週期/停經狀態差異大（停經後 25.8–134.8），以報告範圍為準。"
+  },
+  {
+   "key": "lh",
+   "zh": "黃體生成素",
+   "en": "LH",
+   "unit": "mIU/mL",
+   "low": null,
+   "high": null,
+   "sex_specific": {
+    "M": [
+     1.8,
+     8.6
+    ],
+    "F": [
+     5,
+     25
+    ]
+   },
+   "source": "MedlinePlus LH blood test https://medlineplus.gov/ency/article/003708.htm",
+   "note": "女性停經前 5–25，停經後 7.7–58.5，排卵期會有高峰。"
+  },
+  {
+   "key": "e2",
+   "zh": "雌二醇",
+   "en": "Estradiol (E2)",
+   "unit": "pg/mL",
+   "low": null,
+   "high": null,
+   "sex_specific": {
+    "M": [
+     10,
+     50
+    ],
+    "F": [
+     30,
+     400
+    ]
+   },
+   "source": "MedlinePlus Estradiol blood test https://medlineplus.gov/ency/article/003711.htm",
+   "note": "女性停經前 30–400（依週期），停經後 0–30。"
+  },
+  {
+   "key": "prolactin",
+   "zh": "泌乳激素",
+   "en": "Prolactin",
+   "unit": "ng/mL",
+   "low": null,
+   "high": 25,
+   "sex_specific": {
+    "M": [
+     null,
+     20
+    ],
+    "F": [
+     null,
+     25
+    ]
+   },
+   "source": "MedlinePlus Prolactin blood test https://medlineplus.gov/ency/article/003718.htm",
+   "note": "非懷孕女性 <25、男性 <20；壓力、藥物可升高。"
+  },
+  {
+   "key": "progesterone",
+   "zh": "黃體酮",
+   "en": "Progesterone",
+   "unit": "ng/mL",
+   "low": null,
+   "high": null,
+   "sex_specific": {
+    "M": [
+     null,
+     1.0
+    ],
+    "F": [
+     null,
+     null
+    ]
+   },
+   "source": "MedlinePlus Serum progesterone https://medlineplus.gov/ency/article/003714.htm",
+   "note": "男性/停經後 <1；女性排卵前 <1、黃體期 5–20，依週期判讀。"
+  },
+  {
+   "key": "amh",
+   "zh": "抗穆勒氏管荷爾蒙",
+   "en": "AMH",
+   "unit": "ng/mL",
+   "low": null,
+   "high": null,
+   "source": "年齡別參考值，依實驗室而異",
+   "note": "卵巢庫存指標，隨年齡下降，無單一成人區間；以報告/生殖醫學判讀為準。"
+  },
+  {
+   "key": "beta_hcg",
+   "zh": "β-人類絨毛膜促性腺激素",
+   "en": "Beta-hCG",
+   "unit": "mIU/mL",
+   "low": null,
+   "high": 5,
+   "source": "MedlinePlus HCG blood test - quantitative https://medlineplus.gov/ency/article/003510.htm",
+   "note": "非懷孕女性 <5、男性 <2 mIU/mL。"
+  },
+  {
+   "key": "na",
+   "zh": "鈉",
+   "en": "Sodium",
+   "unit": "mEq/L",
+   "low": 136,
+   "high": 145,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": ""
+  },
+  {
+   "key": "k",
+   "zh": "鉀",
+   "en": "Potassium",
+   "unit": "mEq/L",
+   "low": 3.5,
+   "high": 5.1,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "溶血可使鉀假性升高。"
+  },
+  {
+   "key": "cl",
+   "zh": "氯",
+   "en": "Chloride",
+   "unit": "mEq/L",
+   "low": 98,
+   "high": 107,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": ""
+  },
+  {
+   "key": "ca",
+   "zh": "鈣",
+   "en": "Calcium",
+   "unit": "mg/dL",
+   "low": 8.6,
+   "high": 10.3,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "臺大醫院 2.15–2.58 mmol/L 換算；受白蛋白影響。"
+  },
+  {
+   "key": "p",
+   "zh": "磷",
+   "en": "Phosphorus",
+   "unit": "mg/dL",
+   "low": 2.5,
+   "high": 5.0,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "MedlinePlus 2.8–4.5。"
+  },
+  {
+   "key": "mg",
+   "zh": "鎂",
+   "en": "Magnesium",
+   "unit": "mg/dL",
+   "low": 1.7,
+   "high": 2.2,
+   "source": "MedlinePlus Magnesium blood test https://medlineplus.gov/ency/article/003487.htm",
+   "note": "臺大醫院 0.78–1.11 mmol/L（約 1.9–2.7 mg/dL）。"
+  },
+  {
+   "key": "ldh",
+   "zh": "乳酸脫氫酶",
+   "en": "LDH",
+   "unit": "U/L",
+   "low": 140,
+   "high": 271,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": ""
+  },
+  {
+   "key": "cpk",
+   "zh": "肌酸激酶",
+   "en": "CPK",
+   "unit": "U/L",
+   "low": 30,
+   "high": 223,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "劇烈運動後可暫時升高。"
+  },
+  {
+   "key": "urine_ph",
+   "zh": "尿液酸鹼值",
+   "en": "Urine pH",
+   "unit": "",
+   "low": 5.0,
+   "high": 8.0,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": ""
+  },
+  {
+   "key": "urine_sg",
+   "zh": "尿比重",
+   "en": "Urine specific gravity",
+   "unit": "",
+   "low": 1.003,
+   "high": 1.035,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "受飲水量影響大。"
+  },
+  {
+   "key": "urobilinogen",
+   "zh": "尿膽素原",
+   "en": "Urobilinogen",
+   "unit": "EU/dL",
+   "low": null,
+   "high": 1.0,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "試紙常見正常讀值 0.1–1.0 EU/dL；臺大醫院列 ≦1.5 mg/dL（信心中等）。"
+  },
+  {
+   "key": "urine_protein",
+   "zh": "尿蛋白",
+   "en": "Urine protein",
+   "unit": "mg/dL",
+   "low": null,
+   "high": null,
+   "qualitative_normal": "陰性",
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "臺大醫院：(−) 至 (±)；1+ 約 30 mg/dL。"
+  },
+  {
+   "key": "urine_glucose",
+   "zh": "尿糖",
+   "en": "Urine glucose",
+   "unit": "mg/dL",
+   "low": null,
+   "high": null,
+   "qualitative_normal": "陰性",
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": ""
+  },
+  {
+   "key": "urine_bil",
+   "zh": "尿膽紅素",
+   "en": "Urine bilirubin",
+   "unit": "",
+   "low": null,
+   "high": null,
+   "qualitative_normal": "陰性",
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": ""
+  },
+  {
+   "key": "urine_ketone",
+   "zh": "尿酮體",
+   "en": "Urine ketone",
+   "unit": "mg/dL",
+   "low": null,
+   "high": null,
+   "qualitative_normal": "陰性",
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "空腹過久、低醣飲食可出現。"
+  },
+  {
+   "key": "urine_nitrite",
+   "zh": "尿亞硝酸鹽",
+   "en": "Urine nitrite",
+   "unit": "",
+   "low": null,
+   "high": null,
+   "qualitative_normal": "陰性",
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": ""
+  },
+  {
+   "key": "urine_ob",
+   "zh": "尿潛血",
+   "en": "Urine occult blood",
+   "unit": "",
+   "low": null,
+   "high": null,
+   "qualitative_normal": "陰性",
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "女性經期前後易出現偽陽性。"
+  },
+  {
+   "key": "urine_le",
+   "zh": "尿白血球酯酶",
+   "en": "Leukocyte esterase",
+   "unit": "",
+   "low": null,
+   "high": null,
+   "qualitative_normal": "陰性",
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": ""
+  },
+  {
+   "key": "urine_wbc",
+   "zh": "尿白血球（試紙）",
+   "en": "Urine WBC (dipstick)",
+   "unit": "",
+   "low": null,
+   "high": null,
+   "qualitative_normal": "陰性",
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": ""
+  },
+  {
+   "key": "urine_rbc_sed",
+   "zh": "尿沉渣紅血球",
+   "en": "Urine sediment RBC",
+   "unit": "/HPF",
+   "low": 0,
+   "high": 2,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "≧3/HPF 視為顯微性血尿（AUA 定義）。"
+  },
+  {
+   "key": "urine_wbc_sed",
+   "zh": "尿沉渣白血球",
+   "en": "Urine sediment WBC",
+   "unit": "/HPF",
+   "low": 0,
+   "high": 5,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": ""
+  },
+  {
+   "key": "urine_epi_sed",
+   "zh": "尿沉渣上皮細胞",
+   "en": "Urine epithelial cells",
+   "unit": "/HPF",
+   "low": 0,
+   "high": 5,
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "多為採檢污染。"
+  },
+  {
+   "key": "urine_crystal_sed",
+   "zh": "尿沉渣結晶體",
+   "en": "Urine crystals",
+   "unit": "/LPF",
+   "low": null,
+   "high": null,
+   "qualitative_normal": "陰性",
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "臺大醫院：無異常結晶。"
+  },
+  {
+   "key": "urine_cast_sed",
+   "zh": "尿沉渣圓柱體",
+   "en": "Urine casts",
+   "unit": "/LPF",
+   "low": 0,
+   "high": 2,
+   "qualitative_normal": "陰性",
+   "source": "臺大醫院健康教育資訊網「檢驗參考值」 https://health.ntuh.gov.tw/health/hrc_v3/DataFiles/kensa.htm",
+   "note": "透明圓柱體 0–2/LPF 可接受；其他病理性圓柱體應為陰性。"
+  },
+  {
+   "key": "bmd",
+   "zh": "骨質密度",
+   "en": "Bone mineral density (T-score)",
+   "unit": "",
+   "low": -1.0,
+   "high": null,
+   "source": "WHO T-score criteria for osteoporosis (1994)；國民健康署 骨質疏鬆專區 https://www.hpa.gov.tw/Pages/List.aspx?nodeid=216",
+   "note": "T 值 ≧ −1.0 正常；−1.0 至 −2.5 骨質缺乏；≦ −2.5 骨質疏鬆。超音波（跟骨）僅為篩檢，確診需 DXA。"
+  }
+ ],
+ "skipped": [
+  {
+   "key": "height",
+   "zh": "身高",
+   "reason": "admin/anthropometric: no reference range"
+  },
+  {
+   "key": "weight",
+   "zh": "體重",
+   "reason": "anthropometric: interpret via BMI"
+  },
+  {
+   "key": "bone_mass",
+   "zh": "骨骼量",
+   "reason": "body-composition device output; no standard range"
+  },
+  {
+   "key": "metabolic_age",
+   "zh": "代謝年齡",
+   "reason": "body-composition device output; no standard range"
+  },
+  {
+   "key": "bmr",
+   "zh": "基礎代謝",
+   "reason": "body-composition device output; depends on sex/age/weight"
+  },
+  {
+   "key": "visceral_fat",
+   "zh": "內臟脂肪等級",
+   "reason": "body-composition device rating (vendor-specific scale)"
+  },
+  {
+   "key": "fat_right_arm",
+   "zh": "右上肢體脂肪率",
+   "reason": "segmental body-composition; no standard range"
+  },
+  {
+   "key": "fat_right_leg",
+   "zh": "右下肢體脂肪率",
+   "reason": "segmental body-composition; no standard range"
+  },
+  {
+   "key": "fat_left_arm",
+   "zh": "左上肢體脂肪率",
+   "reason": "segmental body-composition; no standard range"
+  },
+  {
+   "key": "fat_left_leg",
+   "zh": "左下肢體脂肪率",
+   "reason": "segmental body-composition; no standard range"
+  },
+  {
+   "key": "body_water",
+   "zh": "身體水分",
+   "reason": "body-composition device output; no standard range"
+  },
+  {
+   "key": "ideal_weight",
+   "zh": "理想體重",
+   "reason": "computed target, not a measurement"
+  },
+  {
+   "key": "muscle_mass",
+   "zh": "肌肉量",
+   "reason": "body-composition device output; depends on sex/height"
+  },
+  {
+   "key": "fat_trunk",
+   "zh": "軀幹體脂肪率",
+   "reason": "segmental body-composition; no standard range"
+  },
+  {
+   "key": "va_naked_right",
+   "zh": "右眼裸視",
+   "reason": "eye exam (visual acuity); not a lab range"
+  },
+  {
+   "key": "va_naked_left",
+   "zh": "左眼裸視",
+   "reason": "eye exam (visual acuity); not a lab range"
+  },
+  {
+   "key": "va_corr_right",
+   "zh": "右眼矯正視力",
+   "reason": "eye exam (visual acuity); not a lab range"
+  },
+  {
+   "key": "va_corr_left",
+   "zh": "左眼矯正視力",
+   "reason": "eye exam (visual acuity); not a lab range"
+  },
+  {
+   "key": "iop_right",
+   "zh": "右眼眼壓",
+   "reason": "eye exam (commonly 10-21 mmHg, device-dependent); out of scope"
+  },
+  {
+   "key": "iop_left",
+   "zh": "左眼眼壓",
+   "reason": "eye exam (commonly 10-21 mmHg, device-dependent); out of scope"
+  },
+  {
+   "key": "hearing_r_500",
+   "zh": "右耳聽力 500Hz",
+   "reason": "audiometry threshold; out of scope (commonly <=25 dB HL normal)"
+  },
+  {
+   "key": "hearing_r_1k",
+   "zh": "右耳聽力 1kHz",
+   "reason": "audiometry threshold; out of scope (commonly <=25 dB HL normal)"
+  },
+  {
+   "key": "hearing_r_2k",
+   "zh": "右耳聽力 2kHz",
+   "reason": "audiometry threshold; out of scope (commonly <=25 dB HL normal)"
+  },
+  {
+   "key": "hearing_l_500",
+   "zh": "左耳聽力 500Hz",
+   "reason": "audiometry threshold; out of scope (commonly <=25 dB HL normal)"
+  },
+  {
+   "key": "hearing_l_1k",
+   "zh": "左耳聽力 1kHz",
+   "reason": "audiometry threshold; out of scope (commonly <=25 dB HL normal)"
+  },
+  {
+   "key": "hearing_l_2k",
+   "zh": "左耳聽力 2kHz",
+   "reason": "audiometry threshold; out of scope (commonly <=25 dB HL normal)"
+  },
+  {
+   "key": "cvd_10y_risk",
+   "zh": "心血管疾病十年風險",
+   "reason": "computed risk score (model-dependent categories), not a lab range"
+  },
+  {
+   "key": "framingham_score",
+   "zh": "心力評量總分",
+   "reason": "computed risk score (point total), not a lab range"
+  }
+ ]
+}

@@ -1,0 +1,10 @@
+* text=auto eol=lf
+*.pdf binary
+*.png binary
+*.jpg binary
+*.gif binary
+*.ttf binary
+*.ttc binary
+*.pptx binary
+*.sqlite3 binary
+*.ps1 text eol=crlf

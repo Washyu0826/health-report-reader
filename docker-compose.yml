@@ -1,0 +1,76 @@
+services:
+
+  # ── Ollama (LLM, embeddings, OCR) ─────────────────────────────────────────
+  ollama:
+    image: ollama/ollama:latest
+    container_name: health_tagger_ollama
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:11434:11434"   # host loopback only; the app reaches it as http://ollama:11434
+    volumes:
+      - ollama_data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_NUM_PARALLEL=2
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ── Model bootstrap ─────────────────────────────────────────────────────────
+  ollama-init:
+    image: ollama/ollama:latest
+    container_name: health_tagger_ollama_init
+    depends_on:
+      ollama:
+        condition: service_healthy
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    entrypoint: >
+      sh -c "
+        ollama pull qwen2.5:7b &&
+        ollama pull qwen3-embedding:0.6b &&
+        (ollama pull glm-ocr || echo 'glm-ocr unavailable: scanned PDFs will not be OCR-ed') &&
+        echo 'Models ready.'
+      "
+    restart: "no"
+
+  # ── Gradio UI ───────────────────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: health_tagger_app
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:7860:7860"      # open http://127.0.0.1:7860 on the host
+    depends_on:
+      ollama:
+        condition: service_healthy
+      ollama-init:
+        condition: service_completed_successfully
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - KB_JSON_PATH=/app/data/kb_sample.json
+      - REFERENCE_RANGES_PATH=/app/data/reference_ranges.json
+      - CHROMA_DB_PATH=/app/chroma_db
+      - USE_RERANKER=0             # the reranker needs requirements-rerank.txt (torch)
+    volumes:
+      - app_data:/app/chroma_db    # vector index, web-search cache, opt-in trend store
+
+volumes:
+  ollama_data:
+    driver: local
+  app_data:
+    driver: local

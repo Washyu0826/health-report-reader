@@ -1,0 +1,32 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install
+        # requirements-langchain.txt: so the LangChain adapter tests run too
+        run: pip install -r requirements-dev.txt -r requirements-langchain.txt
+      - name: Lint
+        run: ruff check --select F,E9 .
+      - name: Unit tests (no GPU, no Ollama, network blocked by the egress test)
+        run: pytest -q
+      - name: Abnormal-flagging regression set
+        run: python eval/test_abnormal.py
+      - name: Synthetic dataset is consistent and leak-free
+        # --no-regen: the byte-identical regeneration check needs the CJK font the
+        # PDFs were rendered with (Microsoft JhengHei); run it locally on Windows.
+        run: |
+          python eval/synth/verify.py --no-regen
+          python eval/synth/check_no_real_data.py
+      - name: Abnormal detection on the synthetic set (no LLM)
+        run: python eval/run_eval.py --no-llm --out /tmp/results_no_llm.json

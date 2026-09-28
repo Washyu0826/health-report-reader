@@ -1,0 +1,6 @@
+# Optional LangChain / LangGraph adapter (integrations/langchain, examples/).
+# The core pipeline does not need any of these.
+-r requirements.txt
+langchain-core==1.6.5
+langchain-ollama==1.1.0
+langgraph==1.2.12

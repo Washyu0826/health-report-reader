@@ -1,0 +1,32 @@
+# VCS, environments, caches
+.git
+.github
+.venv
+venv
+**/__pycache__
+**/*.pyc
+.pytest_cache
+.ruff_cache
+.claude
+.vscode
+.idea
+
+# runtime state (mounted as a volume instead)
+chroma_db
+uploads
+**/*.sqlite3
+.env*
+
+# evaluation artefacts and benchmark indexes (not needed at runtime)
+eval/_chroma
+eval/_chroma_bench
+eval/results*
+eval/retrieval_*.json
+eval/samples
+tests
+
+# private / non-redistributable data never goes into an image
+*.csv
+data/knowledge_base.json
+data/checkitem_kb.json
+data/brand_terms.txt

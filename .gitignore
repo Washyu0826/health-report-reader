@@ -1,0 +1,32 @@
+# Generated / runtime
+chroma_db/
+uploads/
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+
+# Sensitive raw data exports never belong in the repo
+/*.csv
+
+# IDE / tooling
+.claude/
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+/tmp/
+
+# Third-party KB content and its publisher terms (license not cleared for redistribution)
+data/knowledge_base.json
+data/brand_terms.txt
+
+# benchmark vector DBs
+eval/_chroma_bench/
+.ruff_cache/
+eval/_chroma*/
