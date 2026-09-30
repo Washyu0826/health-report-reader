@@ -18,15 +18,21 @@ findings and evidence-backed health tags, fully on a local GPU.**
 ## At a glance
 
 ```mermaid
-flowchart LR
-    A["1 · Read<br/>any layout,<br/>text or scanned"] --> B["2 · Check<br/>143 standard item names,<br/>printed vs public ranges"]
-    B --> C["3 · Flag<br/>screening rules,<br/>each with its evidence"]
-    C --> D["4 · Review<br/>optional nurse check<br/>before any advice"]
-    D --> E["5 · Advise<br/>local LLM cites sources,<br/>every claim verified"]
+%%{init: {"flowchart": {"rankSpacing": 18, "nodeSpacing": 18, "wrappingWidth": 460}}}%%
+flowchart TB
+    subgraph R ["Rules: numbers and flags never come from the LLM"]
+        direction TB
+        A["<b>1 · Read</b> any layout, text or scanned"] --> B["<b>2 · Check</b> 143 item names; printed and public ranges"] --> C["<b>3 · Flag</b> screening rules, each with its evidence"]
+    end
+    subgraph L ["Advice: reviewed, cited, checked"]
+        direction TB
+        D["<b>4 · Review</b> optional nurse check"] --> E["<b>5 · Advise</b> local LLM cites sources; every claim checked"]
+    end
+    R --> L
 ```
 
-Steps 1–3 are rules: the numbers and flags never come from the LLM. The LLM only writes advice in step 5, may only cite
-passages it was shown, and every citation is checked before it is shown.
+The LLM only writes advice in step 5: it may only cite passages it was shown, and every citation is checked before it
+is shown.
 
 ## Why
 
@@ -80,12 +86,12 @@ that passage.
 
 <table>
 <tr>
-<td width="50%"><img src="docs/img/ui_tags.png" alt="Tags with sources; one advice tag opened to show its cited passage"><br><b>Tags and evidence.</b> Every tag shows its source (report, rule, knowledge base) and verdict; click one to see the passage it cites.</td>
-<td width="50%"><img src="docs/img/ui_review.png" alt="Nurse review checklist with one condition unticked"><br><b>Nurse review.</b> The run pauses after the rules; untick a false flag and confirm before any advice is written.</td>
+<td width="50%" valign="top"><img src="docs/img/ui_tags.png" alt="Tags with sources; one advice tag opened to show its cited passage"><br><b>Tags and evidence.</b> Every tag shows its source (report, rule, knowledge base) and verdict; click one to see the passage it cites.</td>
+<td width="50%" valign="top"><img src="docs/img/ui_review.png" alt="Nurse review checklist with one condition unticked"><br><b>Nurse review.</b> The run pauses after the rules; untick a false flag and confirm before any advice is written.</td>
 </tr>
 <tr>
-<td><img src="docs/img/ui_references.png" alt="Retrieved passages grouped by finding"><br><b>References.</b> The fact sheet and passages retrieved for each abnormal finding, and which were sent to the LLM.</td>
-<td><img src="docs/img/ui_trend.png" alt="Triglycerides across two reports"><br><b>Trends.</b> Values across a person's reports, stored under a salted ID, never the name. Shown: a demo ID over two synthetic reports, triglycerides 83 → 248.</td>
+<td valign="top"><img src="docs/img/ui_references.png" alt="Retrieved passages grouped by finding"><br><b>References.</b> The fact sheet and passages retrieved for each abnormal finding, and which were sent to the LLM.</td>
+<td valign="top"><img src="docs/img/ui_trend.png" alt="Triglycerides across two reports"><br><b>Trends.</b> Values across a person's reports, stored under a salted ID, never the name. Shown: a demo ID over two synthetic reports, triglycerides 83 → 248.</td>
 </tr>
 </table>
 
@@ -109,18 +115,23 @@ that passage.
 ## How it works
 
 ```mermaid
-flowchart LR
-    A[PDF] --> B{text layer?}
-    B -- no --> O[local OCR<br/>GLM-OCR] --> C
-    B -- yes --> C[table-aware extraction]
-    C --> D[findings<br/>143 item names · printed vs public ranges · sex · units]
-    D --> E[condition rules<br/>screening criteria + evidence]
-    D --> F[retrieval<br/>per abnormal finding]
-    E --> R{nurse review?<br/>optional pause}
-    F --> R
-    R --> G[LLM advice<br/>qwen2.5:7b · JSON schema · citation enum]
-    G --> H[claim verification<br/>lexical → batched LLM check]
-    H --> I[tags + evidence + audit]
+%%{init: {"flowchart": {"rankSpacing": 22, "nodeSpacing": 18}}}%%
+flowchart TB
+    subgraph X ["Read the PDF"]
+        direction LR
+        B{text<br/>layer?} -- no --> O[local OCR<br/>GLM-OCR] --> C
+        B -- yes --> C[table-aware<br/>extraction]
+    end
+    subgraph Y ["Rules and retrieval, in parallel"]
+        direction LR
+        D[findings<br/>143 names · units<br/>printed + public ranges] --> E[condition rules<br/>screening criteria<br/>+ evidence] & F[retrieval<br/>per abnormal<br/>finding]
+        E & F --> R{nurse<br/>review?}
+    end
+    subgraph Z ["Advice, checked"]
+        direction LR
+        G[LLM advice<br/>qwen2.5:7b · JSON schema<br/>citation enum] --> H[claim check<br/>lexical, then<br/>batched LLM] --> I[tags + evidence<br/>+ audit]
+    end
+    X --> Y --> Z
 ```
 
 The flow runs as a **LangGraph** `StateGraph` ([docs/graph.md](docs/graph.md)): rules and retrieval run in parallel, the
@@ -175,38 +186,46 @@ Requirements: Python 3.11, [Ollama](https://ollama.com), an NVIDIA GPU with ≥8
 ```bash
 ollama pull qwen2.5:7b
 ollama pull qwen3-embedding:0.6b
-ollama pull glm-ocr                                  # optional, for scanned PDFs
+ollama pull glm-ocr                  # optional, for scanned PDFs
 
-python -m venv .venv && .venv/Scripts/activate       # Windows (Linux/macOS: source .venv/bin/activate)
+python -m venv .venv
+.venv/Scripts/activate               # Windows; Linux/macOS: source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
 **UI** (patients, nurses)
 
 ```bash
-python ui.py                                         # http://127.0.0.1:7860 — tick "護理師審核" for the review step;
-                                                     # downloads: JSON, CSV, FHIR
-python ui.py --demo-stub                             # try the UI without any model
+python ui.py                         # http://127.0.0.1:7860; downloads JSON, CSV, FHIR
+python ui.py --demo-stub             # try the UI without any model
 ```
+
+Tick **護理師審核** (nurse review) to pause after the rules, so a nurse can confirm the flags before any advice is
+written.
 
 **Batch** (health-check centres, platforms)
 
 ```bash
-python batch.py reports/ --out results/              # per-report JSON/CSV + summary.csv + findings_all.csv
-python batch.py reports/ --no-llm                    # findings and rule flags only; no Ollama needed
-python batch.py reports/ --fhir                      # also <name>.fhir.json (FHIR R4, LOINC-coded)
+# JSON/CSV per report, plus summary.csv and findings_all.csv across all reports
+python batch.py reports/ --out results/
+python batch.py reports/ --no-llm         # findings and rule flags only, no Ollama
+python batch.py reports/ --fhir           # adds <name>.fhir.json (FHIR R4 + LOINC)
 ```
 
 **Python API** (developers)
 
 ```python
 from pipeline import analyze_pdf
-r = analyze_pdf(open("report.pdf", "rb").read())   # retrieval: fact sheets only; pass retriever= for a KB
-r.findings                  # normalised lab values: standard key, value, unit, status, both ranges
-r.tags                      # conditions, risks, metrics, advice; each tag with its source and verdict
+
+# retrieval uses the built-in fact sheets; pass retriever= to add a knowledge base
+r = analyze_pdf(open("report.pdf", "rb").read())
+r.findings  # normalised lab values: key, value, unit, status, both ranges
+r.tags      # conditions, risks, metrics, advice; each with its source and verdict
 
 from graph_workflow import resume_review, run_graph
-r = run_graph(open("report.pdf", "rb").read(), review=True)      # pauses when the rules flag something
+
+# review=True pauses when the rules flag something
+r = run_graph(open("report.pdf", "rb").read(), review=True)
 if r.pending_review:
     r = resume_review(r.pending_review["token"], {"remove": {"conditions": ["過重"]}})
 ```
@@ -220,29 +239,30 @@ Docker: `docker compose up --build` (NVIDIA container toolkit required).
 **Evaluation** (researchers)
 
 ```bash
-pytest -q                                            # unit, privacy and UI tests; no GPU needed
-python eval/test_abnormal.py                         # findings regression set
-python eval/run_eval.py                              # end-to-end on the 60 synthetic reports
-python eval/synth/generate.py                        # regenerate the synthetic set (seed 20260925)
+pytest -q                            # unit, privacy and UI tests; no GPU needed
+python eval/test_abnormal.py         # findings regression set
+python eval/run_eval.py              # end-to-end on the 60 synthetic reports
+python eval/ocr_eval.py              # OCR on scans at 3 quality levels (needs glm-ocr)
+python eval/synth/generate.py        # regenerate the synthetic set (seed 20260925)
 ```
 
 ## Project structure
 
 ```
 pipeline.py            analysis stages and the analyze_pdf() entry point
-graph_workflow.py      LangGraph StateGraph: parallel rules/retrieval, nurse-review interrupt, verify loop
+graph_workflow.py      LangGraph StateGraph: parallel rules/retrieval, review interrupt
 pdf_utils.py, ocr.py   PDF text and table extraction; local OCR for scanned pages
 abnormal.py            item-name normalisation, value and range parsing, abnormal flags
 conditions.py          screening-criteria conditions and risks, with evidence
-retrieval.py           report-driven retrieval (per finding), fact sheets, optional BM25/reranker
-llm.py, verify.py      schema-constrained advice with a citation enum; claim verification
+retrieval.py           per-finding retrieval, fact sheets, optional BM25/reranker
+llm.py, verify.py      schema-constrained advice (citation enum); claim verification
 ui.py, batch.py        Gradio UI (streaming, review, trends, exports); bulk CLI
 fhir_export.py         FHIR R4 Bundle export (LOINC codes from data/loinc_map.json)
 storage.py             trend store keyed by a salted ID, never the name
 web_fallback.py        optional web search, off by default (canonical item names only)
 integrations/          LangChain retriever and tools
-data/                  reference ranges, lab synonyms, knowledge base (public sources, written for this project)
-eval/                  evaluation harness, synthetic report generator, results history
+data/                  reference ranges, lab synonyms, LOINC map, knowledge base
+eval/                  evaluation harness, OCR evaluation, synthetic reports, history
 tests/                 unit, privacy (egress, tracing), LangGraph and UI tests
 ```
 

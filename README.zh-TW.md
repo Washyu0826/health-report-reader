@@ -17,14 +17,20 @@
 ## 一眼看懂
 
 ```mermaid
-flowchart LR
-    A["1 · 讀取<br/>任何排版<br/>文字檔或掃描檔"] --> B["2 · 核對<br/>143 項標準名稱<br/>報告範圍 vs 公開範圍"]
-    B --> C["3 · 判定<br/>依篩檢標準<br/>每項附證據"]
-    C --> D["4 · 審核<br/>可選的護理師確認<br/>在產生建議之前"]
-    D --> E["5 · 建議<br/>本機 LLM 引用來源<br/>逐條查核"]
+%%{init: {"flowchart": {"rankSpacing": 18, "nodeSpacing": 18, "wrappingWidth": 460}}}%%
+flowchart TB
+    subgraph R ["規則：數值與判定不經過 LLM"]
+        direction TB
+        A["<b>1 · 讀取</b> 任何排版，文字檔或掃描檔"] --> B["<b>2 · 核對</b> 143 項標準名稱；報告範圍與公開範圍"] --> C["<b>3 · 判定</b> 依篩檢標準，每項附證據"]
+    end
+    subgraph L ["建議：審核、引用、查核"]
+        direction TB
+        D["<b>4 · 審核</b> 護理師確認（可選）"] --> E["<b>5 · 建議</b> 本機 LLM 引用來源，逐條查核"]
+    end
+    R --> L
 ```
 
-第 1～3 步都是規則：數值和判定從來不經過 LLM。LLM 只在第 5 步撰寫建議，只能引用它實際看到的段落，每條引用在顯示前都會查核。
+LLM 只在第 5 步撰寫建議：只能引用它實際看到的段落，每條引用在顯示前都會查核。
 
 ## 為什麼要做
 
@@ -73,12 +79,12 @@ flowchart LR
 
 <table>
 <tr>
-<td width="50%"><img src="docs/img/ui_tags.png" alt="各類標籤與來源；點開一個建議標籤顯示它引用的段落"><br><b>標籤與依據。</b>每個標籤都標示來源（報告、規則、知識庫）與查核結果，點開就能看到引用的段落。</td>
-<td width="50%"><img src="docs/img/ui_review.png" alt="護理師審核清單，其中一項判定被取消勾選"><br><b>護理師審核。</b>規則判定完先暫停，取消勾選誤判的項目並確認後，才開始產生建議。</td>
+<td width="50%" valign="top"><img src="docs/img/ui_tags.png" alt="各類標籤與來源；點開一個建議標籤顯示它引用的段落"><br><b>標籤與依據。</b>每個標籤都標示來源（報告、規則、知識庫）與查核結果，點開就能看到引用的段落。</td>
+<td width="50%" valign="top"><img src="docs/img/ui_review.png" alt="護理師審核清單，其中一項判定被取消勾選"><br><b>護理師審核。</b>規則判定完先暫停，取消勾選誤判的項目並確認後，才開始產生建議。</td>
 </tr>
 <tr>
-<td><img src="docs/img/ui_references.png" alt="依異常項目分組的參考資料"><br><b>參考資料。</b>每個異常項目檢索到的項目說明卡與知識庫段落，以及哪些有交給 LLM。</td>
-<td><img src="docs/img/ui_trend.png" alt="兩份報告的三酸甘油脂變化"><br><b>趨勢。</b>同一個人歷次報告的數值變化，以加鹽雜湊的代號儲存，不存姓名。圖中是示範代號下的兩份合成報告：三酸甘油脂 83 → 248。</td>
+<td valign="top"><img src="docs/img/ui_references.png" alt="依異常項目分組的參考資料"><br><b>參考資料。</b>每個異常項目檢索到的項目說明卡與知識庫段落，以及哪些有交給 LLM。</td>
+<td valign="top"><img src="docs/img/ui_trend.png" alt="兩份報告的三酸甘油脂變化"><br><b>趨勢。</b>同一個人歷次報告的數值變化，以加鹽雜湊的代號儲存，不存姓名。圖中是示範代號下的兩份合成報告：三酸甘油脂 83 → 248。</td>
 </tr>
 </table>
 
@@ -102,18 +108,23 @@ flowchart LR
 ## 運作原理
 
 ```mermaid
-flowchart LR
-    A[PDF] --> B{有文字層?}
-    B -- 否 --> O[本機 OCR<br/>GLM-OCR] --> C
-    B -- 是 --> C[依表格結構擷取]
-    C --> D[檢驗結果<br/>143 項標準名稱 · 報告範圍 vs 公開範圍 · 性別 · 單位]
-    D --> E[狀況規則<br/>篩檢標準 + 證據]
-    D --> F[檢索<br/>依每個異常項目]
-    E --> R{護理師審核?<br/>可選的暫停}
-    F --> R
-    R --> G[LLM 建議<br/>qwen2.5:7b · JSON schema · 引用 enum]
-    G --> H[逐條查核<br/>字面比對 → 批次 LLM 查核]
-    H --> I[標籤 + 依據 + 稽核紀錄]
+%%{init: {"flowchart": {"rankSpacing": 22, "nodeSpacing": 18}}}%%
+flowchart TB
+    subgraph X ["讀取 PDF"]
+        direction LR
+        B{有文字層?} -- 否 --> O[本機 OCR<br/>GLM-OCR] --> C
+        B -- 是 --> C[依表格結構<br/>擷取]
+    end
+    subgraph Y ["規則判定與檢索平行執行"]
+        direction LR
+        D[檢驗結果<br/>143 項標準名稱 · 單位<br/>報告範圍 + 公開範圍] --> E[狀況規則<br/>篩檢標準 + 證據] & F[檢索<br/>依每個異常項目]
+        E & F --> R{護理師<br/>審核?}
+    end
+    subgraph Z ["建議與查核"]
+        direction LR
+        G[LLM 建議<br/>qwen2.5:7b · JSON schema<br/>引用 enum] --> H[逐條查核<br/>字面比對 →<br/>批次 LLM] --> I[標籤 + 依據<br/>+ 稽核紀錄]
+    end
+    X --> Y --> Z
 ```
 
 整個流程是一個 **LangGraph** `StateGraph`（[docs/graph.md](docs/graph.md)）：規則判定與檢索平行執行；審核步驟是
@@ -166,38 +177,45 @@ LangGraph 的 `interrupt`（狀態只存在記憶體）；處理進度與 LLM �
 ```bash
 ollama pull qwen2.5:7b
 ollama pull qwen3-embedding:0.6b
-ollama pull glm-ocr                                  # 選用，處理掃描檔
+ollama pull glm-ocr                  # 選用，處理掃描檔
 
-python -m venv .venv && .venv/Scripts/activate       # Windows（Linux/macOS：source .venv/bin/activate）
+python -m venv .venv
+.venv/Scripts/activate               # Windows；Linux/macOS 用 source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
 **介面**（受檢者、護理師）
 
 ```bash
-python ui.py                                         # http://127.0.0.1:7860，勾選「護理師審核」即可使用審核步驟；
-                                                     # 可下載 JSON、CSV、FHIR
-python ui.py --demo-stub                             # 不需要任何模型的示範模式
+python ui.py                         # http://127.0.0.1:7860，可下載 JSON、CSV、FHIR
+python ui.py --demo-stub             # 不需要任何模型的示範模式
 ```
+
+勾選「護理師審核」後，流程會在規則判定完暫停，由護理師確認判定後才產生建議。
 
 **批次處理**（健檢中心、健康平台）
 
 ```bash
-python batch.py reports/ --out results/              # 每份報告的 JSON/CSV + summary.csv + findings_all.csv
-python batch.py reports/ --no-llm                    # 只做檢驗結果與規則判定，不需要 Ollama
-python batch.py reports/ --fhir                      # 另外輸出 <name>.fhir.json（FHIR R4，附 LOINC 代碼）
+# 每份報告的 JSON/CSV，另外彙整所有報告的 summary.csv 與 findings_all.csv
+python batch.py reports/ --out results/
+python batch.py reports/ --no-llm         # 只做檢驗結果與規則判定，不需要 Ollama
+python batch.py reports/ --fhir           # 另輸出 <name>.fhir.json（FHIR R4 + LOINC）
 ```
 
 **Python API**（開發者）
 
 ```python
 from pipeline import analyze_pdf
-r = analyze_pdf(open("report.pdf", "rb").read())   # 檢索：僅項目說明卡；要用知識庫請傳入 retriever=
-r.findings                  # 標準化檢驗值：標準代碼、數值、單位、判定、兩種參考範圍
-r.tags                      # 狀況、風險、指標、建議；每個標籤都附來源與查核結果
+
+# 檢索預設只用項目說明卡；要加入知識庫請傳入 retriever=
+r = analyze_pdf(open("report.pdf", "rb").read())
+r.findings  # 標準化檢驗值：標準代碼、數值、單位、判定、兩種參考範圍
+r.tags      # 狀況、風險、指標、建議；每個標籤都附來源與查核結果
 
 from graph_workflow import resume_review, run_graph
-r = run_graph(open("report.pdf", "rb").read(), review=True)      # 規則有判定時會暫停
+
+# review=True：規則有判定時會暫停
+r = run_graph(open("report.pdf", "rb").read(), review=True)
 if r.pending_review:
     r = resume_review(r.pending_review["token"], {"remove": {"conditions": ["過重"]}})
 ```
@@ -211,17 +229,18 @@ Docker：`docker compose up --build`（需安裝 NVIDIA container toolkit）。
 **評估**（研究者）
 
 ```bash
-pytest -q                                            # 單元、隱私與介面測試，不需要 GPU
-python eval/test_abnormal.py                         # 檢驗結果回歸測試集
-python eval/run_eval.py                              # 在 60 份合成報告上跑端到端評估
-python eval/synth/generate.py                        # 重新產生合成資料集（seed 20260925）
+pytest -q                            # 單元、隱私與介面測試，不需要 GPU
+python eval/test_abnormal.py         # 檢驗結果回歸測試集
+python eval/run_eval.py              # 在 60 份合成報告上跑端到端評估
+python eval/ocr_eval.py              # 三種品質的掃描檔 OCR 評估（需要 glm-ocr）
+python eval/synth/generate.py        # 重新產生合成資料集（seed 20260925）
 ```
 
 ## 專案結構
 
 ```
 pipeline.py            分析步驟與 analyze_pdf() 入口
-graph_workflow.py      LangGraph StateGraph：規則與檢索平行、護理師審核 interrupt、查核迴圈
+graph_workflow.py      LangGraph StateGraph：規則與檢索平行、護理師審核 interrupt
 pdf_utils.py, ocr.py   PDF 文字與表格擷取；掃描頁的本機 OCR
 abnormal.py            項目名稱正規化、數值與參考範圍解析、異常判定
 conditions.py          依篩檢標準判定狀況與風險，附證據
@@ -232,8 +251,8 @@ fhir_export.py         FHIR R4 Bundle 輸出（LOINC 代碼來自 data/loinc_map
 storage.py             趨勢紀錄，以加鹽代號儲存，不存姓名
 web_fallback.py        選用的網路搜尋，預設關閉（只送出標準化項目名稱）
 integrations/          LangChain retriever 與 tools
-data/                  參考範圍、項目同義詞、知識庫（依公開資料為本專案撰寫）
-eval/                  評估工具、合成報告產生器、歷次結果
+data/                  參考範圍、項目同義詞、LOINC 對照、知識庫
+eval/                  評估工具、OCR 評估、合成報告產生器、歷次結果
 tests/                 單元、隱私（外連、tracing）、LangGraph 與介面測試
 ```
 
