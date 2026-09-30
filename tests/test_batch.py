@@ -67,3 +67,15 @@ def test_batch_folder_input_and_scanned_pdf_reports_error(tmp_path):
 def test_batch_rejects_non_pdf_inputs(tmp_path):
     with pytest.raises(SystemExit):
         batch.main([str(tmp_path / "missing.docx"), "--no-llm", "--out", str(tmp_path)])
+
+
+def test_batch_fhir_bundles(tmp_path):
+    rc = batch.main([str(SAMPLES / TEXT_PDFS[0]), "--no-llm", "--fhir", "--out", str(tmp_path)])
+    assert rc == 0
+    b = json.loads((tmp_path / "syn_002.fhir.json").read_text(encoding="utf-8"))
+    types = [e["resource"]["resourceType"] for e in b["entry"]]
+    assert b["resourceType"] == "Bundle" and types.count("Patient") == 1 and "DiagnosticReport" in types
+    obs = [e["resource"] for e in b["entry"] if e["resource"]["resourceType"] == "Observation"]
+    loinc = {c["code"] for o in obs for c in o["code"].get("coding", []) if c["system"] == "http://loinc.org"}
+    assert "1558-6" in loinc                                           # fasting glucose
+    assert any(i["coding"][0]["code"] == "H" for o in obs for i in o.get("interpretation", []))

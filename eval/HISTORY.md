@@ -103,3 +103,50 @@ relevant 48.2% (508 tags), latency p50 9.6 s / mean 11.0 s / max 44.6 s (scanned
   overhead is 0.023 s per report (p50; total minus the node timings) and LLM time is unchanged (p50 8.0 s). The rest
   of the difference is machine load on the CPU stages: extraction + findings took 0.38 s both called directly and
   inside the graph at the same moment, vs 0.11 s on 2026-09-28.
+
+## R11 — OCR evaluation and fixes; FHIR export (2026-09-30)
+
+**OCR evaluation** (`eval/ocr_eval.py`): the synthetic set had only 3 scanned reports, all bordered tables. Now 20
+text-layer synthetic reports, spread over the five text layouts, are rendered to images and scanned at three seeded
+levels, 60 scans in all:
+* **clean:** 200 dpi, straight.
+* **medium:** the generator's own scan effect: 150 dpi, 0.6–1.6° skew, noise, blur, JPEG 72.
+* **heavy:** 150 dpi, 1.8–2.6° skew, stronger noise and blur, JPEG 55.
+
+Each scan runs without the LLM and is scored against gold. The same reports' text layer is the paired control
+(abnormal F1 1.00).
+
+| Scan level | Abnormal F1 | Precision | Found (of 92) | False positives | Values exact | OCR s/page |
+|---|---|---|---|---|---|---|
+| clean, before → after | 0.60 → **0.92** | 0.56 → 0.95 | 60 → 82 | 48 → **4** | 71% → 89% | 12 |
+| medium, before → after | 0.84 → **0.93** | 0.93 → 0.99 | 70 → 81 | 5 → **1** | 83% → 91% | 12 |
+| heavy, before → after | 0.85 → **0.91** | 0.97 → 1.00 | 70 → 76 | 2 → **0** | 75% → 81% | 11 |
+
+**What the first run found** (raw OCR output inspected):
+1. **Text outside tables was dropped.** A page often comes back as one small table (the header) plus plain text
+   lines, and `ocr_pdf` kept only the table rows. The plain layout scored 0%.
+2. **Full-width digits came back spaced out, with a middle dot:** `１５８．０` → `1 5 8 · 0`. The parser kept `1`,
+   which caused 42 of the 48 clean-scan false positives.
+3. **Report words sometimes came back in simplified characters** (参考值, 红血球), so header columns went unrecognised.
+
+All three are fixed in `ocr.py` post-processing (`clean_ocr_text`, `_text_outside_tables`). Text-layer PDFs are
+unaffected. `tests/test_ocr.py` covers each case.
+
+**After the fixes, value accuracy by layout:**
+
+| Layout | clean | medium | heavy |
+|---|---|---|---|
+| standard | 100% | 100% | 78% |
+| two-column | 72% | 77% | 73% |
+| inline flags | 76% | 100% | 97% |
+| full-width digits | 99% | 82% | 81% |
+| plain | 100% | 97% | 97% |
+
+**Remaining weakness:** rows dropped in two-column pages and in heavily degraded scans. These are missed values, not
+invented ones: precision stays ≥ 0.95. The 5 remaining false positives come from values OCR misread, such as
+84 → 8.4 or 152.1 → 1.
+
+**FHIR export:** `fhir_export.py` writes findings as a FHIR R4 Bundle with one LOINC-coded Observation per value.
+- `data/loinc_map.json` maps 122 of the 143 items (99 high, 23 medium confidence); 21 are left null on purpose.
+- Every code was checked ACTIVE in LOINC 2.82. The bundles validate against `fhir.resources`.
+- The Patient carries only gender; no header identity leaks (tested).

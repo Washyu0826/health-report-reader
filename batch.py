@@ -4,6 +4,7 @@ batch.py — Analyse many health-check PDFs at once and write standardised table
     python batch.py reports/                     # every PDF in the folder
     python batch.py a.pdf b.pdf --out results/
     python batch.py reports/ --no-llm            # extraction + findings + rule tags only; no Ollama
+    python batch.py reports/ --fhir              # also <name>.fhir.json (FHIR R4 Bundle, LOINC-coded)
 
 Writes to --out (default ./batch_out):
   * <name>.json / <name>.csv   one per report, same schema as the UI's downloads
@@ -11,6 +12,7 @@ Writes to --out (default ./batch_out):
                                citation support, seconds, error)
   * findings_all.csv           every lab value of every report in ONE long table with canonical
                                item keys, so reports from different clinics and layouts line up
+  * <name>.fhir.json           with --fhir: the findings as a FHIR R4 Bundle (see fhir_export.py)
 
 Runs locally like the UI (same models and settings from config.py). Report text is not written
 anywhere; output file names follow the input file names, so keep --out as private as the PDFs.
@@ -29,6 +31,7 @@ from typing import Dict, List
 
 import config
 import ui
+from fhir_export import to_fhir_bundle, write_fhir
 from pipeline import NO_TEXT_ERROR, analyze_pdf
 
 SUMMARY_COLS = ["file", "status", "sex", "findings", "abnormal", "range_conflicts", "conditions", "risks",
@@ -114,6 +117,8 @@ def main(argv=None) -> int:
     ap.add_argument("--no-llm", action="store_true",
                     help="no Ollama: extraction, abnormal findings and rule conditions/risks only "
                          "(no advice, no OCR for scanned PDFs)")
+    ap.add_argument("--fhir", action="store_true",
+                    help="also write <name>.fhir.json: a FHIR R4 Bundle with LOINC-coded Observations")
     ap.add_argument("--sex", choices=["auto", "M", "F"], default="auto",
                     help="patient sex for sex-specific ranges (default: read it from each report)")
     args = ap.parse_args(argv)
@@ -140,6 +145,9 @@ def main(argv=None) -> int:
             d["mode"] = "no-llm"
         (out / f"{stem}.json").write_text(json.dumps(d, ensure_ascii=False, indent=2), encoding="utf-8")
         (out / f"{stem}.csv").write_text(ui.export_csv(a), encoding="utf-8-sig")
+        if args.fhir and a.result.findings:
+            write_fhir(out / f"{stem}.fhir.json",
+                       to_fhir_bundle(a.result.findings, sex=a.result.sex, report_date=a.report_date))
         row = summary_row(pdf.name, a)
         summaries.append(row)
         findings += finding_rows(pdf.name, a)

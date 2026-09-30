@@ -60,6 +60,7 @@ from pipeline import PipelineResult, analyze_pdf
 from report_cache import ReportCache, cache_key, config_fingerprint
 from retrieval import CheckitemFacts, Retriever
 from verify import verify_tags
+from fhir_export import to_fhir_bundle, write_fhir
 from web_fallback import WebFallback, build_query
 
 log = logging.getLogger("ui")
@@ -841,6 +842,16 @@ def write_exports(a: Analysis) -> Tuple[str, str]:
     return str(jp), str(cp)
 
 
+def export_fhir(a: Analysis) -> Dict:
+    """FHIR R4 Bundle of the lab findings (fhir_export.py): LOINC-coded Observations; no report
+    text, and the Patient carries only gender."""
+    return to_fhir_bundle(a.result.findings, sex=a.result.sex, report_date=a.report_date)
+
+
+def write_fhir_export(a: Analysis) -> str:
+    return write_fhir(Path(tempfile.mkdtemp(prefix="hrt_fhir_")) / "health_report.fhir.json", export_fhir(a))
+
+
 # ─── Trends ──────────────────────────────────────────────────────────────────
 
 def trend_choices(patient_id: str, runs_db: str = RUNS_DB) -> List[Tuple[str, str]]:
@@ -1044,12 +1055,14 @@ def build_app(res: Resources, runs_db: str = RUNS_DB):
                 with gr.Row():
                     dl_json = gr.DownloadButton("下載 JSON", value=None, interactive=False)
                     dl_csv = gr.DownloadButton("下載 CSV", value=None, interactive=False)
+                    dl_fhir = gr.DownloadButton("下載 FHIR", value=None, interactive=False)
         gr.HTML(f'<div id="footer">⚕ {esc(DISCLAIMER)}任何健康疑慮請諮詢醫師或專業醫療人員。</div>')
 
         sample.change(lambda s: sample_map.get(s), inputs=sample, outputs=pdf)
 
         outputs = [status, notices, overview, tags_html, findings_html, refs_html, perf_html, audit,
-                   dl_json, dl_csv, state, trend_item, trend_plot, trend_table, review_box, review_items]
+                   dl_json, dl_csv, state, trend_item, trend_plot, trend_table, review_box, review_items,
+                   dl_fhir]
         at = outputs.index
 
         def _progress(work, only_abn_v, progress):
@@ -1129,6 +1142,8 @@ def build_app(res: Resources, runs_db: str = RUNS_DB):
                 render_references(a), render_perf(a, res), render_audit(a))
             upd[at(dl_json)] = gr.update(value=jp, interactive=True)
             upd[at(dl_csv)] = gr.update(value=cp, interactive=True)
+            if a.result.findings:
+                upd[at(dl_fhir)] = gr.update(value=write_fhir_export(a), interactive=True)
             upd[at(trend_item)] = gr.update(choices=choices, value=first)
             upd[at(trend_plot)], upd[at(trend_table)] = plot_df, table_df
             yield upd

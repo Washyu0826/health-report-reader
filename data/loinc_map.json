@@ -1,0 +1,1157 @@
+{
+  "_doc": [
+    "LOINC code per canonical lab item of data/lab_synonyms.json, for FHIR export (fhir_export.py).",
+    "loinc: LOINC code or null (not mapped - see note). display: LOINC long common name (LOINC 2.82).",
+    "ucum: UCUM code for the item's canonical unit in data/lab_synonyms.json (null = none / not asserted).",
+    "confidence: high | medium (null when unmapped). See data/loinc_map.README.md.",
+    "Interoperability demo mapping - must be reviewed before any clinical use."
+  ],
+  "version": 1,
+  "source": "LOINC 2.82; every code verified ACTIVE via HL7 tx.fhir.org CodeSystem/$lookup and NLM Clinical Tables LOINC search (loinc.org pages are bot-protected); verified 2026-09-30.",
+  "items": {
+    "height": {
+      "loinc": "8302-2",
+      "display": "Body height",
+      "ucum": "cm",
+      "confidence": "high",
+      "source_url": "https://loinc.org/8302-2",
+      "note": "Standing body height."
+    },
+    "weight": {
+      "loinc": "29463-7",
+      "display": "Body weight",
+      "ucum": "kg",
+      "confidence": "high",
+      "source_url": "https://loinc.org/29463-7",
+      "note": "Body weight."
+    },
+    "bmi": {
+      "loinc": "39156-5",
+      "display": "Body mass index (BMI) [Ratio]",
+      "ucum": "kg/m2",
+      "confidence": "high",
+      "source_url": "https://loinc.org/39156-5",
+      "note": "BMI (weight/height^2)."
+    },
+    "body_fat_pct": {
+      "loinc": "77233-5",
+      "display": "Percentage of body fat by Bioelectrical impedance analysis",
+      "ucum": "%",
+      "confidence": "medium",
+      "source_url": "https://loinc.org/77233-5",
+      "note": "Health-check body fat % comes from a bioelectrical-impedance (BIA) scale; use 41982-0 (Percentage of body fat Measured) if another method (e.g. DXA) was used."
+    },
+    "waist": {
+      "loinc": "8280-0",
+      "display": "Waist Circumference at umbilicus by Tape measure",
+      "ucum": "cm",
+      "confidence": "medium",
+      "source_url": "https://loinc.org/8280-0",
+      "note": "LOINC's tape-measure waist term is defined at the umbilicus; Taiwan HPA protocol measures midway between the lowest rib and the iliac crest. Same property/unit, measurement site differs."
+    },
+    "pulse": {
+      "loinc": "8867-4",
+      "display": "Heart rate",
+      "ucum": "/min",
+      "confidence": "high",
+      "source_url": "https://loinc.org/8867-4",
+      "note": "FHIR vital-signs heart-rate code; resting pulse counted at the health check. UCUM /min as required by the FHIR vital-signs profile."
+    },
+    "sbp": {
+      "loinc": "8480-6",
+      "display": "Systolic blood pressure",
+      "ucum": "mm[Hg]",
+      "confidence": "high",
+      "source_url": "https://loinc.org/8480-6",
+      "note": "Stand-alone systolic BP (the FHIR vital-signs profile alternatively groups SBP/DBP in panel 85354-9)."
+    },
+    "dbp": {
+      "loinc": "8462-4",
+      "display": "Diastolic blood pressure",
+      "ucum": "mm[Hg]",
+      "confidence": "high",
+      "source_url": "https://loinc.org/8462-4",
+      "note": "Stand-alone diastolic BP."
+    },
+    "temperature": {
+      "loinc": "8310-5",
+      "display": "Body temperature",
+      "ucum": "Cel",
+      "confidence": "high",
+      "source_url": "https://loinc.org/8310-5",
+      "note": "Body temperature (site not specified)."
+    },
+    "bone_mass": {
+      "loinc": null,
+      "display": null,
+      "ucum": "kg",
+      "confidence": null,
+      "source_url": null,
+      "note": "BIA-scale estimate of bone mineral mass (Tanita-style 'bone mass'); no matching LOINC term found."
+    },
+    "metabolic_age": {
+      "loinc": null,
+      "display": null,
+      "ucum": null,
+      "confidence": null,
+      "source_url": null,
+      "note": "Proprietary body-composition-scale index; not a standard measurement, no LOINC term."
+    },
+    "bmr": {
+      "loinc": null,
+      "display": null,
+      "ucum": null,
+      "confidence": null,
+      "source_url": null,
+      "note": "Device-estimated basal metabolic rate (kcal/day) from a BIA scale. LOINC only offers resting-metabolic-rate terms (e.g. 69429-9 'Metabolic rate --resting', kcal/kg/h) with a different definition/property; not mapped."
+    },
+    "visceral_fat": {
+      "loinc": null,
+      "display": null,
+      "ucum": null,
+      "confidence": null,
+      "source_url": null,
+      "note": "Proprietary 1-59 rating on BIA scales. LOINC 73707-2 is visceral fat AREA (cm2, imaging) - a different property."
+    },
+    "fat_right_arm": {
+      "loinc": null,
+      "display": null,
+      "ucum": "%",
+      "confidence": null,
+      "source_url": null,
+      "note": "Segmental BIA fat %; no segment-specific LOINC term found."
+    },
+    "fat_right_leg": {
+      "loinc": null,
+      "display": null,
+      "ucum": "%",
+      "confidence": null,
+      "source_url": null,
+      "note": "Segmental BIA fat %; no segment-specific LOINC term found."
+    },
+    "fat_left_arm": {
+      "loinc": null,
+      "display": null,
+      "ucum": "%",
+      "confidence": null,
+      "source_url": null,
+      "note": "Segmental BIA fat %; no segment-specific LOINC term found."
+    },
+    "fat_left_leg": {
+      "loinc": null,
+      "display": null,
+      "ucum": "%",
+      "confidence": null,
+      "source_url": null,
+      "note": "Segmental BIA fat %; no segment-specific LOINC term found."
+    },
+    "body_water": {
+      "loinc": null,
+      "display": null,
+      "ucum": null,
+      "confidence": null,
+      "source_url": null,
+      "note": "Devices report kg or % (LOINC 101683-1 'Body water mass' vs 101684-9 'Percentage of body water'); the catalog unit is blank so the property is unknown."
+    },
+    "ideal_weight": {
+      "loinc": "50064-5",
+      "display": "Ideal body weight",
+      "ucum": "kg",
+      "confidence": "medium",
+      "source_url": "https://loinc.org/50064-5",
+      "note": "Calculated target weight; the formula varies by provider (commonly BMI 22 x height^2)."
+    },
+    "muscle_mass": {
+      "loinc": "73964-9",
+      "display": "Body muscle mass Calculated",
+      "ucum": "kg",
+      "confidence": "medium",
+      "source_url": "https://loinc.org/73964-9",
+      "note": "BIA scales derive muscle mass by calculation; 73964-9 is 'Body muscle mass Calculated'. Device algorithms differ."
+    },
+    "wbc": {
+      "loinc": "6690-2",
+      "display": "Leukocytes [#/volume] in Blood by Automated count",
+      "ucum": "10*3/uL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/6690-2",
+      "note": "Automated haematology analyser."
+    },
+    "rbc": {
+      "loinc": "789-8",
+      "display": "Erythrocytes [#/volume] in Blood by Automated count",
+      "ucum": "10*6/uL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/789-8",
+      "note": "Automated haematology analyser."
+    },
+    "hb": {
+      "loinc": "718-7",
+      "display": "Hemoglobin [Mass/volume] in Blood",
+      "ucum": "g/dL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/718-7",
+      "note": "Whole-blood haemoglobin."
+    },
+    "hct": {
+      "loinc": "4544-3",
+      "display": "Hematocrit [Volume Fraction] of Blood by Automated count",
+      "ucum": "%",
+      "confidence": "high",
+      "source_url": "https://loinc.org/4544-3",
+      "note": "Automated count (calculated by the analyser)."
+    },
+    "mcv": {
+      "loinc": "787-2",
+      "display": "MCV [Entitic mean volume] in Red Blood Cells by Automated count",
+      "ucum": "fL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/787-2",
+      "note": "Automated count."
+    },
+    "mch": {
+      "loinc": "785-6",
+      "display": "MCH [Entitic mass] by Automated count",
+      "ucum": "pg",
+      "confidence": "high",
+      "source_url": "https://loinc.org/785-6",
+      "note": "Automated count."
+    },
+    "mchc": {
+      "loinc": "786-4",
+      "display": "MCHC [Entitic Mass/volume] in Red Blood Cells by Automated count",
+      "ucum": "g/dL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/786-4",
+      "note": "Automated count."
+    },
+    "plt": {
+      "loinc": "777-3",
+      "display": "Platelets [#/volume] in Blood by Automated count",
+      "ucum": "10*3/uL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/777-3",
+      "note": "Automated count."
+    },
+    "rdw": {
+      "loinc": "788-0",
+      "display": "Erythrocyte [DistWidth] in Blood by Automated count",
+      "ucum": "%",
+      "confidence": "high",
+      "source_url": "https://loinc.org/788-0",
+      "note": "RDW-CV in % (catalog unit). RDW-SD in fL would be 21000-5."
+    },
+    "mpv": {
+      "loinc": "32623-1",
+      "display": "Platelet [Entitic mean volume] in Blood by Automated count",
+      "ucum": "fL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/32623-1",
+      "note": "Automated count."
+    },
+    "pct": {
+      "loinc": "51637-7",
+      "display": "Plateletcrit [Volume Fraction] in Blood",
+      "ucum": "%",
+      "confidence": "high",
+      "source_url": "https://loinc.org/51637-7",
+      "note": "Plateletcrit."
+    },
+    "pdw": {
+      "loinc": "51631-0",
+      "display": "Platelet distribution width [Ratio] in Blood",
+      "ucum": "%",
+      "confidence": "medium",
+      "source_url": "https://loinc.org/51631-0",
+      "note": "Catalog unit is %, so the ratio term is used; analysers that report PDW in fL need 32207-3."
+    },
+    "eos_pct": {
+      "loinc": "713-8",
+      "display": "Eosinophils/Leukocytes in Blood by Automated count",
+      "ucum": "%",
+      "confidence": "high",
+      "source_url": "https://loinc.org/713-8",
+      "note": "Automated differential."
+    },
+    "baso_pct": {
+      "loinc": "706-2",
+      "display": "Basophils/Leukocytes in Blood by Automated count",
+      "ucum": "%",
+      "confidence": "high",
+      "source_url": "https://loinc.org/706-2",
+      "note": "Automated differential."
+    },
+    "mono_pct": {
+      "loinc": "5905-5",
+      "display": "Monocytes/Leukocytes in Blood by Automated count",
+      "ucum": "%",
+      "confidence": "high",
+      "source_url": "https://loinc.org/5905-5",
+      "note": "Automated differential."
+    },
+    "lymph_pct": {
+      "loinc": "736-9",
+      "display": "Lymphocytes/Leukocytes in Blood by Automated count",
+      "ucum": "%",
+      "confidence": "high",
+      "source_url": "https://loinc.org/736-9",
+      "note": "Automated differential."
+    },
+    "neut_pct": {
+      "loinc": "770-8",
+      "display": "Neutrophils/Leukocytes in Blood by Automated count",
+      "ucum": "%",
+      "confidence": "high",
+      "source_url": "https://loinc.org/770-8",
+      "note": "Automated differential."
+    },
+    "lymph_abs": {
+      "loinc": "731-0",
+      "display": "Lymphocytes [#/volume] in Blood by Automated count",
+      "ucum": "10*3/uL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/731-0",
+      "note": "Automated differential."
+    },
+    "mono_abs": {
+      "loinc": "742-7",
+      "display": "Monocytes [#/volume] in Blood by Automated count",
+      "ucum": "10*3/uL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/742-7",
+      "note": "Automated differential."
+    },
+    "eos_abs": {
+      "loinc": "711-2",
+      "display": "Eosinophils [#/volume] in Blood by Automated count",
+      "ucum": "10*3/uL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/711-2",
+      "note": "Automated differential."
+    },
+    "baso_abs": {
+      "loinc": "704-7",
+      "display": "Basophils [#/volume] in Blood by Automated count",
+      "ucum": "10*3/uL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/704-7",
+      "note": "Automated differential."
+    },
+    "neut_abs": {
+      "loinc": "751-8",
+      "display": "Neutrophils [#/volume] in Blood by Automated count",
+      "ucum": "10*3/uL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/751-8",
+      "note": "Automated differential."
+    },
+    "albumin": {
+      "loinc": "1751-7",
+      "display": "Albumin [Mass/volume] in Serum or Plasma",
+      "ucum": "g/dL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/1751-7",
+      "note": "Serum/plasma albumin."
+    },
+    "globulin": {
+      "loinc": "10834-0",
+      "display": "Globulin [Mass/volume] in Serum by calculation",
+      "ucum": "g/dL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/10834-0",
+      "note": "Globulin is reported as total protein minus albumin (calculated)."
+    },
+    "total_protein": {
+      "loinc": "2885-2",
+      "display": "Protein [Mass/volume] in Serum or Plasma",
+      "ucum": "g/dL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/2885-2",
+      "note": "Serum/plasma total protein."
+    },
+    "ast": {
+      "loinc": "1920-8",
+      "display": "Aspartate aminotransferase [Enzymatic activity/volume] in Serum or Plasma",
+      "ucum": "U/L",
+      "confidence": "high",
+      "source_url": "https://loinc.org/1920-8",
+      "note": "AST (GOT)."
+    },
+    "alt": {
+      "loinc": "1742-6",
+      "display": "Alanine aminotransferase [Enzymatic activity/volume] in Serum or Plasma",
+      "ucum": "U/L",
+      "confidence": "high",
+      "source_url": "https://loinc.org/1742-6",
+      "note": "ALT (GPT)."
+    },
+    "bil_total": {
+      "loinc": "1975-2",
+      "display": "Bilirubin.total [Mass/volume] in Serum or Plasma",
+      "ucum": "mg/dL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/1975-2",
+      "note": "Total bilirubin."
+    },
+    "bil_direct": {
+      "loinc": "1968-7",
+      "display": "Bilirubin.direct [Mass/volume] in Serum or Plasma",
+      "ucum": "mg/dL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/1968-7",
+      "note": "Direct (conjugated + delta) bilirubin."
+    },
+    "alp": {
+      "loinc": "6768-6",
+      "display": "Alkaline phosphatase [Enzymatic activity/volume] in Serum or Plasma",
+      "ucum": "U/L",
+      "confidence": "high",
+      "source_url": "https://loinc.org/6768-6",
+      "note": "Alkaline phosphatase."
+    },
+    "ggt": {
+      "loinc": "2324-2",
+      "display": "Gamma glutamyl transferase [Enzymatic activity/volume] in Serum or Plasma",
+      "ucum": "U/L",
+      "confidence": "high",
+      "source_url": "https://loinc.org/2324-2",
+      "note": "Gamma-GT."
+    },
+    "amylase": {
+      "loinc": "1798-8",
+      "display": "Amylase [Enzymatic activity/volume] in Serum or Plasma",
+      "ucum": "U/L",
+      "confidence": "high",
+      "source_url": "https://loinc.org/1798-8",
+      "note": "Total amylase (not pancreatic-specific)."
+    },
+    "ag_ratio": {
+      "loinc": "1759-0",
+      "display": "Albumin/Globulin [Mass Ratio] in Serum or Plasma",
+      "ucum": "{ratio}",
+      "confidence": "high",
+      "source_url": "https://loinc.org/1759-0",
+      "note": "Albumin/globulin mass ratio."
+    },
+    "bun": {
+      "loinc": "3094-0",
+      "display": "Urea nitrogen [Mass/volume] in Serum or Plasma",
+      "ucum": "mg/dL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/3094-0",
+      "note": "Blood urea nitrogen."
+    },
+    "creatinine": {
+      "loinc": "2160-0",
+      "display": "Creatinine [Mass/volume] in Serum or Plasma",
+      "ucum": "mg/dL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/2160-0",
+      "note": "Serum/plasma creatinine."
+    },
+    "uric_acid": {
+      "loinc": "3084-1",
+      "display": "Urate [Mass/volume] in Serum or Plasma",
+      "ucum": "mg/dL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/3084-1",
+      "note": "Urate."
+    },
+    "egfr": {
+      "loinc": "77147-7",
+      "display": "Glomerular filtration rate [Volume Rate/Area] in Serum, Plasma or Blood by Creatinine-based formula (MDRD)/1.73 sq M",
+      "ucum": "mL/min/{1.73_m2}",
+      "confidence": "medium",
+      "source_url": "https://loinc.org/77147-7",
+      "note": "Reports rarely name the equation. Many Taiwanese reports use the (simplified) MDRD equation; the older MDRD code 33914-3 is DISCOURAGED in LOINC 2.82, so active 77147-7 is used. Use 62238-1 (CKD-EPI) or 98979-8 (CKD-EPI 2021) when the lab states CKD-EPI."
+    },
+    "chol": {
+      "loinc": "2093-3",
+      "display": "Cholesterol [Mass/volume] in Serum or Plasma",
+      "ucum": "mg/dL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/2093-3",
+      "note": "Total cholesterol."
+    },
+    "tg": {
+      "loinc": "2571-8",
+      "display": "Triglyceride [Mass/volume] in Serum or Plasma",
+      "ucum": "mg/dL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/2571-8",
+      "note": "Triglyceride."
+    },
+    "hdl": {
+      "loinc": "2085-9",
+      "display": "Cholesterol in HDL [Mass/volume] in Serum or Plasma",
+      "ucum": "mg/dL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/2085-9",
+      "note": "HDL cholesterol."
+    },
+    "ldl": {
+      "loinc": "2089-1",
+      "display": "Cholesterol in LDL [Mass/volume] in Serum or Plasma",
+      "ucum": "mg/dL",
+      "confidence": "medium",
+      "source_url": "https://loinc.org/2089-1",
+      "note": "Method-neutral LDL-C term. Reports rarely say whether LDL-C was measured directly (18262-6) or calculated by Friedewald (13457-7) and both occur in Taiwanese health checks, so the method-less code is used instead of guessing."
+    },
+    "chol_hdl_ratio": {
+      "loinc": "9830-1",
+      "display": "Cholesterol.total/Cholesterol in HDL [Mass Ratio] in Serum or Plasma",
+      "ucum": "{ratio}",
+      "confidence": "high",
+      "source_url": "https://loinc.org/9830-1",
+      "note": "Total cholesterol / HDL-C."
+    },
+    "ldl_hdl_ratio": {
+      "loinc": "11054-4",
+      "display": "Cholesterol in LDL/Cholesterol in HDL [Mass Ratio] in Serum or Plasma",
+      "ucum": "{ratio}",
+      "confidence": "high",
+      "source_url": "https://loinc.org/11054-4",
+      "note": "LDL-C / HDL-C."
+    },
+    "risk_factor": {
+      "loinc": null,
+      "display": null,
+      "ucum": null,
+      "confidence": null,
+      "source_url": null,
+      "note": "'動脈硬化指數' is defined differently by different labs (TC/HDL, LDL/HDL or (TC-HDL)/HDL); the catalog entry itself says HDL/LDL. Not mapped; use chol_hdl_ratio / ldl_hdl_ratio when the definition is known."
+    },
+    "glucose_ac": {
+      "loinc": "1558-6",
+      "display": "Fasting glucose [Mass/volume] in Serum or Plasma",
+      "ucum": "mg/dL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/1558-6",
+      "note": "Fasting plasma/serum glucose."
+    },
+    "hba1c": {
+      "loinc": "4548-4",
+      "display": "Hemoglobin A1c/Hemoglobin.total in Blood",
+      "ucum": "%",
+      "confidence": "high",
+      "source_url": "https://loinc.org/4548-4",
+      "note": "Method-neutral HbA1c (NGSP %); HPLC-specific term is 17856-6."
+    },
+    "afp": {
+      "loinc": "1834-1",
+      "display": "Alpha-1-Fetoprotein [Mass/volume] in Serum or Plasma",
+      "ucum": "ng/mL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/1834-1",
+      "note": "Serum AFP (non-pregnant adult)."
+    },
+    "cea": {
+      "loinc": "2039-6",
+      "display": "Carcinoembryonic Ag [Mass/volume] in Serum or Plasma",
+      "ucum": "ng/mL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/2039-6",
+      "note": "Serum CEA."
+    },
+    "ca199": {
+      "loinc": "24108-3",
+      "display": "Cancer Ag 19-9 [Units/volume] in Serum or Plasma",
+      "ucum": "[arb'U]/mL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/24108-3",
+      "note": "Reports print U/mL; these are arbitrary units, hence UCUM [arb'U]/mL (LOINC example unit)."
+    },
+    "ca125": {
+      "loinc": "10334-1",
+      "display": "Cancer Ag 125 [Units/volume] in Serum or Plasma",
+      "ucum": "[arb'U]/mL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/10334-1",
+      "note": "Reports print U/mL (arbitrary units)."
+    },
+    "ca153": {
+      "loinc": "6875-9",
+      "display": "Cancer Ag 15-3 [Units/volume] in Serum or Plasma",
+      "ucum": "[arb'U]/mL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/6875-9",
+      "note": "Reports print U/mL (arbitrary units)."
+    },
+    "psa": {
+      "loinc": "2857-1",
+      "display": "Prostate specific Ag [Mass/volume] in Serum or Plasma",
+      "ucum": "ng/mL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/2857-1",
+      "note": "Total PSA."
+    },
+    "ebv_iga": {
+      "loinc": null,
+      "display": null,
+      "ucum": null,
+      "confidence": null,
+      "source_url": null,
+      "note": "Taiwanese NPC screening uses EBV VCA-IgA and/or EBNA1-IgA with titre, index or qualitative results depending on the kit; LOINC terms are antigen- and scale-specific (e.g. 22290-1 VCA IgA titer, 31369-2 VCA IgA units/volume), so no single code is safe."
+    },
+    "cyfra": {
+      "loinc": "25390-6",
+      "display": "Cytokeratin 19 [Mass/volume] in Serum or Plasma",
+      "ucum": "ng/mL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/25390-6",
+      "note": "CYFRA 21-1 measures cytokeratin 19 fragments; LOINC lists 'Cyfra 21-1' as a related name of 25390-6."
+    },
+    "nse": {
+      "loinc": "15060-7",
+      "display": "Enolase.neuron specific [Mass/volume] in Serum or Plasma",
+      "ucum": "ng/mL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/15060-7",
+      "note": "Serum NSE (mass concentration; ng/mL = ug/L)."
+    },
+    "hs_crp": {
+      "loinc": "30522-7",
+      "display": "C reactive protein [Mass/volume] in Serum or Plasma by High sensitivity method",
+      "ucum": "mg/dL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/30522-7",
+      "note": "High-sensitivity CRP. LOINC example unit is mg/L; mass/volume property, so the catalog's mg/dL is valid."
+    },
+    "crp": {
+      "loinc": "1988-5",
+      "display": "C reactive protein [Mass/volume] in Serum or Plasma",
+      "ucum": "mg/dL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/1988-5",
+      "note": "CRP (mass/volume)."
+    },
+    "insulin": {
+      "loinc": "20448-7",
+      "display": "Insulin [Units/volume] in Serum or Plasma",
+      "ucum": "u[IU]/mL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/20448-7",
+      "note": "Serum insulin; drawn fasting at health checks (fasting state is not part of this code)."
+    },
+    "homa_ir": {
+      "loinc": "47214-2",
+      "display": "Homeostasis model assessment",
+      "ucum": "{Index_val}",
+      "confidence": "medium",
+      "source_url": "https://loinc.org/47214-2",
+      "note": "LOINC 47214-2 'Homeostasis model assessment' does not distinguish HOMA-IR from HOMA-%B; health checks report HOMA-IR (from fasting glucose x insulin)."
+    },
+    "homocysteine": {
+      "loinc": "13965-9",
+      "display": "Homocysteine [Moles/volume] in Serum or Plasma",
+      "ucum": "umol/L",
+      "confidence": "high",
+      "source_url": "https://loinc.org/13965-9",
+      "note": "Total homocysteine."
+    },
+    "hbsag": {
+      "loinc": "5196-1",
+      "display": "Hepatitis B virus surface Ag [Presence] in Serum or Plasma by Immunoassay",
+      "ucum": "{COI}",
+      "confidence": "medium",
+      "source_url": "https://loinc.org/5196-1",
+      "note": "Qualitative (Presence) immunoassay term. Reports print the cut-off index (COI, <1 = non-reactive) of that qualitative assay. Quantitative HBsAg in IU/mL would be 63557-3."
+    },
+    "anti_hbs": {
+      "loinc": "5193-8",
+      "display": "Hepatitis B virus surface Ab [Units/volume] in Serum or Plasma by Immunoassay",
+      "ucum": "m[IU]/mL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/5193-8",
+      "note": "Anti-HBs titre by immunoassay."
+    },
+    "hbeag": {
+      "loinc": "13954-3",
+      "display": "Hepatitis B virus e Ag [Presence] in Serum or Plasma by Immunoassay",
+      "ucum": null,
+      "confidence": "medium",
+      "source_url": "https://loinc.org/13954-3",
+      "note": "Qualitative (Presence) immunoassay term; a printed COI/index of the same assay is carried under it."
+    },
+    "anti_hcv": {
+      "loinc": "13955-0",
+      "display": "Hepatitis C virus Ab [Presence] in Serum or Plasma by Immunoassay",
+      "ucum": "{COI}",
+      "confidence": "medium",
+      "source_url": "https://loinc.org/13955-0",
+      "note": "Qualitative (Presence) immunoassay term; reports print the cut-off index (COI) of that assay."
+    },
+    "rf": {
+      "loinc": "11572-5",
+      "display": "Rheumatoid factor [Units/volume] in Serum or Plasma",
+      "ucum": "[IU]/mL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/11572-5",
+      "note": "Rheumatoid factor (quantitative)."
+    },
+    "hpv_rlu": {
+      "loinc": null,
+      "display": null,
+      "ucum": null,
+      "confidence": null,
+      "source_url": null,
+      "note": "Hybrid-Capture signal ratio (RLU/cutoff); no LOINC term for the HC2 signal ratio found. The qualitative HC2 result would be 30167-1."
+    },
+    "hpv_result": {
+      "loinc": null,
+      "display": null,
+      "ucum": null,
+      "confidence": null,
+      "source_url": null,
+      "note": "Qualitative high-risk HPV DNA result; LOINC terms are assay-specific (30167-1 HC2, 13 types; 82675-0 NAA, 14 types incl. HPV 66) and the report does not identify the assay."
+    },
+    "hpv_highrisk": {
+      "loinc": null,
+      "display": null,
+      "ucum": null,
+      "confidence": null,
+      "source_url": null,
+      "note": "Free-text list of detected high-risk genotypes; no single LOINC term."
+    },
+    "h_pylori_ubt": {
+      "loinc": "29891-9",
+      "display": "Helicobacter pylori [Presence] in Stomach by urea breath test",
+      "ucum": null,
+      "confidence": "medium",
+      "source_url": "https://loinc.org/29891-9",
+      "note": "Qualitative urea-breath-test result. The numeric (DOB, per mil) term 29892-7 is DISCOURAGED in LOINC 2.82."
+    },
+    "fat_trunk": {
+      "loinc": null,
+      "display": null,
+      "ucum": "%",
+      "confidence": null,
+      "source_url": null,
+      "note": "Segmental (trunk) BIA fat %; no segment-specific LOINC term found."
+    },
+    "h_pylori_clo": {
+      "loinc": "32637-1",
+      "display": "Urease [Presence] in Tissue",
+      "ucum": null,
+      "confidence": "high",
+      "source_url": "https://loinc.org/32637-1",
+      "note": "Rapid urease test on gastric biopsy; LOINC lists 'CLO test; Clotest; Helicobacter pylori biopsy test' as related names."
+    },
+    "fobt": {
+      "loinc": "58453-2",
+      "display": "Hemoglobin [Mass/volume] in Stool from gastrointestinal lower by Immunoassay",
+      "ucum": "ng/mL",
+      "confidence": "medium",
+      "source_url": "https://loinc.org/58453-2",
+      "note": "Quantitative faecal immunochemical test (Taiwan national program cut-off 100 ng/mL buffer). Qualitative-only reports (陰性/陽性) correspond to 29771-3."
+    },
+    "t3": {
+      "loinc": "3053-6",
+      "display": "Triiodothyronine (T3) [Mass/volume] in Serum or Plasma",
+      "ucum": "ng/dL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/3053-6",
+      "note": "Total T3."
+    },
+    "free_t3": {
+      "loinc": "3051-0",
+      "display": "Triiodothyronine (T3) Free [Mass/volume] in Serum or Plasma",
+      "ucum": "pg/mL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/3051-0",
+      "note": "Free T3."
+    },
+    "free_t4": {
+      "loinc": "3024-7",
+      "display": "Thyroxine (T4) free [Mass/volume] in Serum or Plasma",
+      "ucum": "ng/dL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/3024-7",
+      "note": "Free T4."
+    },
+    "t4": {
+      "loinc": "3026-2",
+      "display": "Thyroxine (T4) [Mass/volume] in Serum or Plasma",
+      "ucum": "ug/dL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/3026-2",
+      "note": "Total T4."
+    },
+    "tsh": {
+      "loinc": "3016-3",
+      "display": "Thyrotropin [Units/volume] in Serum or Plasma",
+      "ucum": "u[IU]/mL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/3016-3",
+      "note": "TSH; uIU/mL is numerically equal to the LOINC example unit mIU/L."
+    },
+    "fsh": {
+      "loinc": "15067-2",
+      "display": "Follitropin [Units/volume] in Serum or Plasma",
+      "ucum": "m[IU]/mL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/15067-2",
+      "note": "FSH."
+    },
+    "lh": {
+      "loinc": "10501-5",
+      "display": "Lutropin [Units/volume] in Serum or Plasma",
+      "ucum": "m[IU]/mL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/10501-5",
+      "note": "LH."
+    },
+    "e2": {
+      "loinc": "2243-4",
+      "display": "Estradiol (E2) [Mass/volume] in Serum or Plasma",
+      "ucum": "pg/mL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/2243-4",
+      "note": "Estradiol."
+    },
+    "prolactin": {
+      "loinc": "2842-3",
+      "display": "Prolactin [Mass/volume] in Serum or Plasma",
+      "ucum": "ng/mL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/2842-3",
+      "note": "Prolactin."
+    },
+    "progesterone": {
+      "loinc": "2839-9",
+      "display": "Progesterone [Mass/volume] in Serum or Plasma",
+      "ucum": "ng/mL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/2839-9",
+      "note": "Progesterone."
+    },
+    "amh": {
+      "loinc": "38476-8",
+      "display": "Mullerian inhibiting substance [Mass/volume] in Serum or Plasma",
+      "ucum": "ng/mL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/38476-8",
+      "note": "Anti-Mullerian hormone (Mullerian inhibiting substance), mass concentration."
+    },
+    "beta_hcg": {
+      "loinc": "21198-7",
+      "display": "Choriogonadotropin.beta subunit [Units/volume] in Serum or Plasma",
+      "ucum": "m[IU]/mL",
+      "confidence": "medium",
+      "source_url": "https://loinc.org/21198-7",
+      "note": "Reports label the test beta-hCG; many assays actually measure total hCG (19080-1). Chosen per the report label."
+    },
+    "na": {
+      "loinc": "2951-2",
+      "display": "Sodium [Moles/volume] in Serum or Plasma",
+      "ucum": "meq/L",
+      "confidence": "high",
+      "source_url": "https://loinc.org/2951-2",
+      "note": "Sodium; mEq/L = mmol/L for a monovalent ion."
+    },
+    "k": {
+      "loinc": "2823-3",
+      "display": "Potassium [Moles/volume] in Serum or Plasma",
+      "ucum": "meq/L",
+      "confidence": "high",
+      "source_url": "https://loinc.org/2823-3",
+      "note": "Potassium; mEq/L = mmol/L."
+    },
+    "cl": {
+      "loinc": "2075-0",
+      "display": "Chloride [Moles/volume] in Serum or Plasma",
+      "ucum": "meq/L",
+      "confidence": "high",
+      "source_url": "https://loinc.org/2075-0",
+      "note": "Chloride; mEq/L = mmol/L."
+    },
+    "ca": {
+      "loinc": "17861-6",
+      "display": "Calcium [Mass/volume] in Serum or Plasma",
+      "ucum": "mg/dL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/17861-6",
+      "note": "Total calcium."
+    },
+    "p": {
+      "loinc": "2777-1",
+      "display": "Phosphate [Mass/volume] in Serum or Plasma",
+      "ucum": "mg/dL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/2777-1",
+      "note": "Inorganic phosphorus (reported as phosphate)."
+    },
+    "mg": {
+      "loinc": "19123-9",
+      "display": "Magnesium [Mass/volume] in Serum or Plasma",
+      "ucum": "mg/dL",
+      "confidence": "high",
+      "source_url": "https://loinc.org/19123-9",
+      "note": "Magnesium."
+    },
+    "ldh": {
+      "loinc": "14804-9",
+      "display": "Lactate dehydrogenase [Enzymatic activity/volume] in Serum or Plasma by Lactate to pyruvate reaction",
+      "ucum": "U/L",
+      "confidence": "medium",
+      "source_url": "https://loinc.org/14804-9",
+      "note": "The method-less LDH term 2532-0 is DISCOURAGED in LOINC 2.82; the IFCC lactate-to-pyruvate reaction is the usual method on current analysers. Use 14805-6 for pyruvate-to-lactate methods."
+    },
+    "cpk": {
+      "loinc": "2157-6",
+      "display": "Creatine kinase [Enzymatic activity/volume] in Serum or Plasma",
+      "ucum": "U/L",
+      "confidence": "high",
+      "source_url": "https://loinc.org/2157-6",
+      "note": "Total CK."
+    },
+    "urine_ph": {
+      "loinc": "5803-2",
+      "display": "pH of Urine by Test strip",
+      "ucum": "[pH]",
+      "confidence": "high",
+      "source_url": "https://loinc.org/5803-2",
+      "note": "Dipstick pH."
+    },
+    "urine_sg": {
+      "loinc": "5811-5",
+      "display": "Specific gravity of Urine by Test strip",
+      "ucum": "1",
+      "confidence": "high",
+      "source_url": "https://loinc.org/5811-5",
+      "note": "Dipstick specific gravity (dimensionless; UCUM '1')."
+    },
+    "urobilinogen": {
+      "loinc": "32727-0",
+      "display": "Urobilinogen [Units/volume] in Urine",
+      "ucum": "{Ehrlich'U}/dL",
+      "confidence": "medium",
+      "source_url": "https://loinc.org/32727-0",
+      "note": "Catalog unit EU/dL matches 32727-0 (Units/volume, method not stated). Dipstick-specific terms are 20405-7 (mg/dL) and 5818-0 (presence)."
+    },
+    "urine_protein": {
+      "loinc": "20454-5",
+      "display": "Protein [Presence] in Urine by Test strip",
+      "ucum": null,
+      "confidence": "medium",
+      "source_url": "https://loinc.org/20454-5",
+      "note": "Health-check dipstick protein is reported ordinally (-/+-/1+..4+); numeric mg/dL readings correspond to 5804-0."
+    },
+    "urine_glucose": {
+      "loinc": "25428-4",
+      "display": "Glucose [Presence] in Urine by Test strip",
+      "ucum": null,
+      "confidence": "medium",
+      "source_url": "https://loinc.org/25428-4",
+      "note": "Dipstick glucose reported ordinally; numeric mg/dL readings correspond to 5792-7."
+    },
+    "urine_bil": {
+      "loinc": "5770-3",
+      "display": "Bilirubin.total [Presence] in Urine by Test strip",
+      "ucum": null,
+      "confidence": "high",
+      "source_url": "https://loinc.org/5770-3",
+      "note": "Dipstick bilirubin."
+    },
+    "urine_ketone": {
+      "loinc": "2514-8",
+      "display": "Ketones [Presence] in Urine by Test strip",
+      "ucum": null,
+      "confidence": "medium",
+      "source_url": "https://loinc.org/2514-8",
+      "note": "Dipstick ketones reported ordinally; numeric mg/dL readings correspond to 5797-6."
+    },
+    "urine_nitrite": {
+      "loinc": "5802-4",
+      "display": "Nitrite [Presence] in Urine by Test strip",
+      "ucum": null,
+      "confidence": "high",
+      "source_url": "https://loinc.org/5802-4",
+      "note": "Dipstick nitrite."
+    },
+    "urine_ob": {
+      "loinc": "5794-3",
+      "display": "Hemoglobin [Presence] in Urine by Test strip",
+      "ucum": null,
+      "confidence": "high",
+      "source_url": "https://loinc.org/5794-3",
+      "note": "Dipstick blood pad (detects haemoglobin)."
+    },
+    "urine_le": {
+      "loinc": "5799-2",
+      "display": "Leukocyte esterase [Presence] in Urine by Test strip",
+      "ucum": null,
+      "confidence": "high",
+      "source_url": "https://loinc.org/5799-2",
+      "note": "Dipstick leukocyte esterase."
+    },
+    "urine_wbc": {
+      "loinc": "5799-2",
+      "display": "Leukocyte esterase [Presence] in Urine by Test strip",
+      "ucum": null,
+      "confidence": "medium",
+      "source_url": "https://loinc.org/5799-2",
+      "note": "The dipstick 'WBC' pad detects leukocyte esterase, so this shares 5799-2 with urine_le."
+    },
+    "urine_rbc_sed": {
+      "loinc": "13945-1",
+      "display": "Erythrocytes [#/area] in Urine sediment by Microscopy high power field",
+      "ucum": "/[HPF]",
+      "confidence": "high",
+      "source_url": "https://loinc.org/13945-1",
+      "note": "Sediment microscopy, RBC per high-power field."
+    },
+    "urine_wbc_sed": {
+      "loinc": "5821-4",
+      "display": "Leukocytes [#/area] in Urine sediment by Microscopy high power field",
+      "ucum": "/[HPF]",
+      "confidence": "high",
+      "source_url": "https://loinc.org/5821-4",
+      "note": "Sediment microscopy, WBC per high-power field."
+    },
+    "urine_epi_sed": {
+      "loinc": "105113-5",
+      "display": "Epithelial cells [#/area] in Urine sediment",
+      "ucum": "/[HPF]",
+      "confidence": "medium",
+      "source_url": "https://loinc.org/105113-5",
+      "note": "Reports do not specify squamous vs non-squamous or the method, so the generic 'Epithelial cells [#/area] in Urine sediment' term is used."
+    },
+    "urine_crystal_sed": {
+      "loinc": null,
+      "display": null,
+      "ucum": "/[LPF]",
+      "confidence": null,
+      "source_url": null,
+      "note": "LOINC crystal terms are type-specific (calcium oxalate, urate, ...); the 'unidentified crystals' terms (e.g. 40482-2) mean something else. Not mapped."
+    },
+    "urine_cast_sed": {
+      "loinc": "9842-6",
+      "display": "Casts [#/area] in Urine sediment by Microscopy low power field",
+      "ucum": "/[LPF]",
+      "confidence": "high",
+      "source_url": "https://loinc.org/9842-6",
+      "note": "Sediment microscopy, casts per low-power field."
+    },
+    "bmd": {
+      "loinc": null,
+      "display": null,
+      "ucum": null,
+      "confidence": null,
+      "source_url": null,
+      "note": "Health-check BMD is usually a calcaneal ultrasound (QUS) T-score; the LOINC T-score terms found are DXA- and site-specific (e.g. 38266-3 DXA Calcaneus) - a different method."
+    },
+    "va_naked_right": {
+      "loinc": "98499-7",
+      "display": "Visual acuity uncorrected Right eye",
+      "ucum": null,
+      "confidence": "medium",
+      "source_url": "https://loinc.org/98499-7",
+      "note": "Taiwanese reports use decimal acuity (e.g. 0.8); the LOINC term is a length ratio without chart/distance, so no UCUM unit is asserted."
+    },
+    "va_naked_left": {
+      "loinc": "98498-9",
+      "display": "Visual acuity uncorrected Left eye",
+      "ucum": null,
+      "confidence": "medium",
+      "source_url": "https://loinc.org/98498-9",
+      "note": "Decimal acuity; see va_naked_right."
+    },
+    "va_corr_right": {
+      "loinc": null,
+      "display": null,
+      "ucum": null,
+      "confidence": null,
+      "source_url": null,
+      "note": "'矯正視力' is presenting acuity with the examinee's own glasses; LOINC only has 'best corrected' terms (65893-0 / 65897-1), which imply refraction."
+    },
+    "va_corr_left": {
+      "loinc": null,
+      "display": null,
+      "ucum": null,
+      "confidence": null,
+      "source_url": null,
+      "note": "See va_corr_right (LOINC best-corrected term 65897-1 would overstate the method)."
+    },
+    "iop_right": {
+      "loinc": "79892-6",
+      "display": "Right eye Intraocular pressure",
+      "ucum": "mm[Hg]",
+      "confidence": "high",
+      "source_url": "https://loinc.org/79892-6",
+      "note": "Tonometry (non-contact at health checks)."
+    },
+    "iop_left": {
+      "loinc": "79893-4",
+      "display": "Left eye Intraocular pressure",
+      "ucum": "mm[Hg]",
+      "confidence": "high",
+      "source_url": "https://loinc.org/79893-4",
+      "note": "Tonometry (non-contact at health checks)."
+    },
+    "hearing_r_500": {
+      "loinc": "89025-1",
+      "display": "Hearing threshold Ear - right --500 Hz",
+      "ucum": "dB",
+      "confidence": "high",
+      "source_url": "https://loinc.org/89025-1",
+      "note": "Pure-tone audiometry threshold (dB HL)."
+    },
+    "hearing_r_1k": {
+      "loinc": "89017-8",
+      "display": "Hearing threshold Ear - right --1000 Hz",
+      "ucum": "dB",
+      "confidence": "high",
+      "source_url": "https://loinc.org/89017-8",
+      "note": "Pure-tone audiometry threshold (dB HL)."
+    },
+    "hearing_r_2k": {
+      "loinc": "89019-4",
+      "display": "Hearing threshold Ear - right --2000 Hz",
+      "ucum": "dB",
+      "confidence": "high",
+      "source_url": "https://loinc.org/89019-4",
+      "note": "Pure-tone audiometry threshold (dB HL)."
+    },
+    "hearing_l_500": {
+      "loinc": "89024-4",
+      "display": "Hearing threshold Ear - left --500 Hz",
+      "ucum": "dB",
+      "confidence": "high",
+      "source_url": "https://loinc.org/89024-4",
+      "note": "Pure-tone audiometry threshold (dB HL)."
+    },
+    "hearing_l_1k": {
+      "loinc": "89016-0",
+      "display": "Hearing threshold Ear - left --1000 Hz",
+      "ucum": "dB",
+      "confidence": "high",
+      "source_url": "https://loinc.org/89016-0",
+      "note": "Pure-tone audiometry threshold (dB HL)."
+    },
+    "hearing_l_2k": {
+      "loinc": "89018-6",
+      "display": "Hearing threshold Ear - left --2000 Hz",
+      "ucum": "dB",
+      "confidence": "high",
+      "source_url": "https://loinc.org/89018-6",
+      "note": "Pure-tone audiometry threshold (dB HL)."
+    },
+    "cvd_10y_risk": {
+      "loinc": null,
+      "display": null,
+      "ucum": "%",
+      "confidence": null,
+      "source_url": null,
+      "note": "Taiwanese reports use local risk models (e.g. 10-year ischaemic-heart-disease probability); LOINC risk terms are model-specific (Framingham, SCORE, ACC/AHA PCE) or generic (99055-6) with an outcome definition that may not match."
+    },
+    "framingham_score": {
+      "loinc": null,
+      "display": null,
+      "ucum": null,
+      "confidence": null,
+      "source_url": null,
+      "note": "Framingham point total (not a probability); LOINC Framingham terms are model-specific 10-year risk values."
+    }
+  }
+}

@@ -163,3 +163,14 @@ def test_review_mode_bypasses_the_report_cache(res, tmp_path, monkeypatch):
         assert not list((tmp_path / "cache").glob("*.json"))
     finally:
         res.cache = old
+
+
+def test_fhir_export_has_no_report_text(analysis, tmp_path):
+    a, _, _ = analysis
+    b = ui.export_fhir(a)
+    blob = json.dumps(b, ensure_ascii=False)
+    patient = next(e["resource"] for e in b["entry"] if e["resource"]["resourceType"] == "Patient")
+    assert set(patient) <= {"resourceType", "id", "gender"}
+    header = [ln for ln in a.result.text.splitlines() if "姓名" in ln]
+    assert header and not any(tok in blob for tok in header[0].split() if len(tok) >= 3 and "姓名" not in tok)
+    assert Path(ui.write_fhir_export(a)).exists()

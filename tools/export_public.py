@@ -31,14 +31,15 @@ ALLOW = [
     # app
     "config.py", "pipeline.py", "pdf_utils.py", "ocr.py", "abnormal.py", "conditions.py",
     "llm.py", "verify.py", "retrieval.py", "kb_index.py", "embeddings.py", "web_fallback.py",
-    "storage.py", "ui.py", "graph_workflow.py", "report_cache.py", "batch.py",
+    "storage.py", "ui.py", "graph_workflow.py", "report_cache.py", "batch.py", "fhir_export.py",
     # optional LangChain adapter + runnable examples
     "integrations/**", "examples/**", "requirements-langchain.txt",
     # data that is ours
     "data/lab_synonyms.json", "data/reference_ranges.json", "data/reference_ranges.README.md",
     "data/kb_sample.json", "data/kb_sample_extended.json", "data/kb_sample.README.md",
+    "data/loinc_map.json", "data/loinc_map.README.md",
     # evaluation (synthetic only)
-    "eval/run_eval.py", "eval/gt_rules.py", "eval/retrieval_bench.py", "eval/test_abnormal.py",
+    "eval/run_eval.py", "eval/gt_rules.py", "eval/retrieval_bench.py", "eval/test_abnormal.py", "eval/ocr_eval.py",
     "eval/HISTORY.md", "eval/README.md", "eval/results_public/*",
     "eval/synth/*.py", "eval/synth/*.json", "eval/synth/README.md", "eval/synth/samples/*.pdf",
     # tests, tooling, docs
