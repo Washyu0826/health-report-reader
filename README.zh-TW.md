@@ -122,13 +122,14 @@ flowchart TB
     end
     subgraph Z ["建議與查核"]
         direction LR
-        G[LLM 建議<br/>qwen2.5:7b · JSON schema<br/>引用 enum] --> H[逐條查核<br/>字面比對 →<br/>批次 LLM] --> I[標籤 + 依據<br/>+ 稽核紀錄]
+        G[LLM 建議<br/>JSON schema<br/>引用 enum] --> H[逐條查核<br/>字面比對 →<br/>批次 LLM] --> I[標籤 + 依據<br/>+ 稽核紀錄]
     end
     X --> Y --> Z
 ```
 
 整個流程是一個 **LangGraph** `StateGraph`（[docs/graph.md](docs/graph.md)）：規則判定與檢索平行執行；審核步驟是
 LangGraph 的 `interrupt`（狀態只存在記憶體）；處理進度與 LLM 輸出會即時串流到介面。
+模型全部透過 Ollama 在本機執行：qwen2.5:7b（建議）、qwen3-embedding:0.6b（檢索）、GLM-OCR（掃描檔）。
 
 | 問題 | 設計決策 |
 |---|---|

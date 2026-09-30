@@ -129,13 +129,14 @@ flowchart TB
     end
     subgraph Z ["Advice, checked"]
         direction LR
-        G[LLM advice<br/>qwen2.5:7b · JSON schema<br/>citation enum] --> H[claim check<br/>lexical, then<br/>batched LLM] --> I[tags + evidence<br/>+ audit]
+        G[LLM advice<br/>JSON schema,<br/>citation enum] --> H[claim check<br/>lexical, then<br/>batched LLM] --> I[tags + evidence<br/>+ audit]
     end
     X --> Y --> Z
 ```
 
 The flow runs as a **LangGraph** `StateGraph` ([docs/graph.md](docs/graph.md)): rules and retrieval run in parallel, the
 review step is a LangGraph `interrupt` (state kept in memory only), and progress and the LLM's output stream to the UI.
+Models, all local via Ollama: qwen2.5:7b (advice), qwen3-embedding:0.6b (retrieval), GLM-OCR (scans).
 
 | Problem | Design decision |
 |---|---|
