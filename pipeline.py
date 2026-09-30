@@ -1,33 +1,31 @@
 """
-pipeline.py — One end-to-end analysis path shared by the UI and the eval harness.
+pipeline.py — Analysis stages and the stable entry point, analyze_pdf().
 
     PDF bytes -> extract text/tables -> rule-based abnormal findings
               -> report-driven retrieval (+ optional web fallback)
               -> schema-constrained LLM tagging -> claim verification
 
-Each stage is timed; the result carries everything the UI needs to render and
-the eval needs to score. With run_llm=False the pipeline needs no model at all
-(extraction, abnormal detection and fact-sheet lookup only).
+The stage functions live here; graph_workflow.py wires them into a LangGraph
+StateGraph, and analyze_pdf() runs that graph (UI, eval and integrations all go
+through it). Each stage is timed; the result carries everything the UI needs to
+render and the eval needs to score. With run_llm=False no model is needed
+(extraction, abnormal detection, rules and retrieval only).
 """
 
 from __future__ import annotations
 
-import time
 from dataclasses import dataclass, field
 from typing import Callable, Dict, List, Optional, Tuple
 
 import config
 from abnormal import (
-    abnormal_only, evaluate_findings, extract_lab_values, format_findings_for_llm, load_checkitem_lookup,
-    make_llm_normalizer,
+    abnormal_only, evaluate_findings, extract_lab_values, format_findings_for_llm, make_llm_normalizer,
 )
 import conditions as cond_rules
 from embeddings import prefetch_queries
-from llm import analyze_report
 from ocr import is_scanned, ocr_pdf
 from pdf_utils import extract_pdf_content
-from retrieval import GENERAL_QUERY, CheckitemFacts, Retriever, finding_query, select_context
-from verify import llm_support_judge, verify_tags
+from retrieval import GENERAL_QUERY, CheckitemFacts, Retriever, finding_query
 
 _DEFAULT_FACTS: Optional[CheckitemFacts] = None
 
@@ -166,6 +164,7 @@ def analyze_pdf(
     web=None,
     on_stage: Optional[Callable[[str, "PipelineResult"], None]] = None,
     on_llm_text: Optional[Callable[[str], None]] = None,
+    review: bool = False,
 ) -> PipelineResult:
     """checkitem_lookup: lab catalog (abnormal.load_checkitem_lookup); None =
     the public reference ranges (config.REFERENCE_RANGES_PATH).
@@ -183,64 +182,15 @@ def analyze_pdf(
       useful result, ~0.1-1 s), "retrieve" (starting), "llm" (starting),
       "verify" (starting). The partial result must be treated as read-only.
     on_llm_text(raw): streams the LLM's JSON as it is generated
-      (llm.partial_tags turns it into displayable tags)."""
-    r = PipelineResult()
-    if checkitem_lookup is None:
-        checkitem_lookup = load_checkitem_lookup(config.REFERENCE_RANGES_PATH)
-    if retriever is None:
-        retriever = default_retriever()
+      (llm.partial_tags turns it into displayable tags).
+    review: pause for a nurse review of the rule conditions/risks before the
+      LLM (see graph_workflow.run_graph / resume_review).
 
-    notify = on_stage or (lambda stage, result: None)
-    notify("extract", r)
-    t = time.time()
-    content, r.used_ocr, err = extract_stage(pdf_bytes, ocr=ocr, base_url=base_url)
-    if err:
-        r.error, r.error_stage = err, "extract"
-        return r
-    r.text, r.tables = content["text"], content["tables"]
-    r.timing["extract_s"] = round(time.time() - t, 3)
-    if not r.text.strip():
-        r.error, r.error_stage = NO_TEXT_ERROR, "extract"
-        return r
-
-    t = time.time()
-    r.findings, r.abnormal_debug = detect_stage(r.text, r.tables, checkitem_lookup, sex=sex,
-                                                llm_normalize=llm_normalize, model=model, base_url=base_url)
-    r.sex = r.abnormal_debug.get("sex")
-    r.timing["abnormal_s"] = round(time.time() - t, 3)
-    rules = r.rules = rules_stage(r.findings, r.sex, use_rules)
-    notify("findings", r)
-
-    notify("retrieve", r)
-    t = time.time()
-    r.chunks, r.rag_debug = retrieve_stage(retriever, r.abnormals, web=web)
-    r.timing["retrieve_s"] = round(time.time() - t, 3)
-    if not run_llm:
-        return r
-
-    context_text, r.cited_ids = select_context(r.chunks)
-    notify("llm", r)
-    t = time.time()
-    r.tags, r.error = analyze_report(
-        text=r.text,
-        context=context_text,
-        findings_text=findings_prompt(r.findings, rules),
-        model=model,
-        base_url=base_url,
-        chunk_ids=r.cited_ids,
-        findings=r.findings,
-        rules_cover_labs=use_rules,
-        on_text=on_llm_text,
-    )
-    if not r.error:
-        r.tags = merge_rule_tags(r.tags, rules)
-    r.timing["llm_s"] = round(time.time() - t, 3)
-    if not r.error and verify:
-        notify("verify", r)
-        t = time.time()
-        r.tags = verify_tags(r.tags, r.chunks, r.text, r.findings,
-                             judge=llm_support_judge(model, base_url))
-        r.timing["verify_s"] = round(time.time() - t, 3)
-    if r.error:
-        r.error_stage = "llm"
-    return r
+    Orchestration is the LangGraph workflow (graph_workflow.run_graph); this
+    function is its stable entry point. The rewrite loop follows
+    config.VERIFY_REWRITE (off by default: unsupported advice is dropped)."""
+    from graph_workflow import run_graph  # local: graph_workflow imports the stages above
+    return run_graph(pdf_bytes, checkitem_lookup=checkitem_lookup, model=model, base_url=base_url, sex=sex,
+                     retriever=retriever, verify=verify, use_rules=use_rules, ocr=ocr,
+                     llm_normalize=llm_normalize, web=web, run_llm=run_llm,
+                     on_stage=on_stage, on_llm_text=on_llm_text, review=review)

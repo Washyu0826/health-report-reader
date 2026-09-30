@@ -74,6 +74,32 @@ cycle-phase or menopause context, so when a report prints no range for them, val
 menopause are flagged high. That accounts for the only 2 false positives (abnormal F1 0.989).
 
 **Release run** (commit 0672833: v4 prompt, the 2026-09-28 fixes, 57-passage KB; default pipeline; all 60
-synthetic reports): valid outputs 60/60, abnormal F1 0.991 (0 FP; the 5 misses are in the 3 scanned PDFs),
+synthetic reports): valid outputs 60/60, abnormal F1 0.991 (0 FP; all 5 misses are in one scanned PDF, syn_038),
 condition F1 0.95, risk F1 0.88, metrics F1 0.99, 85% of KB citations supported (499/584), advice directly
 relevant 48.2% (508 tags), latency p50 9.6 s / mean 11.0 s / max 44.6 s (scanned PDF with OCR).
+
+## R10 — LangGraph as the orchestration path, nurse review, batch CLI (2026-09-29)
+
+* `pipeline.analyze_pdf` now runs the LangGraph workflow (`graph_workflow.run_graph`); the UI, the eval harness and
+  the LangChain tools all go through one `StateGraph`. **Parity:** with a deterministic fake LLM over all 72 eval PDFs
+  (60 synthetic + 12 internal), findings, rule tags, retrieved chunks, allowed citations, tags with verdicts,
+  verification stats, stage order and streaming calls were identical before and after the change.
+* **Tracing egress (measured):** with `LANGSMITH_TRACING=true` in the environment and no guard, a LangGraph run POSTed
+  its trace (the graph state, i.e. report content) to the tracing endpoint. `run_graph` now forces tracing off for every
+  run; `tests/test_graph_workflow.py` checks it.
+* **Nurse review:** optional `interrupt` before the LLM (in-memory checkpointer); removed conditions/risks never reach
+  the prompt and are recorded in the audit panel and the JSON export.
+* **Batch CLI:** `batch.py` writes per-report JSON/CSV plus `summary.csv` and one `findings_all.csv` across reports.
+* **Real-LLM check of the graph path** (2026-09-30, commit 311a331, default config):
+
+  | Set | Abnormal F1 | Condition F1 | Risk F1 | Citations supported | Advice relevant | p50 |
+  |---|---|---|---|---|---|---|
+  | synthetic 60, R9 release (before) | 0.991 (0 FP) | 0.95 | 0.88 | 85% (499/584) | 48.2% | 9.6 s |
+  | synthetic 60, R10 (LangGraph) | 0.991 (0 FP) | 0.95 | 0.88 | 85% (493/578) | 48.8% | 10.5 s |
+  | internal 12, R9 config (before) | 0.989 | 0.58 | 0.43 | 80% (84/105) | 34.9% | 13.1 s |
+  | internal 12, R10 (LangGraph) | 0.989 | 0.58 | 0.43 | 81% (88/109) | 35.6% | 14.6 s |
+
+  Quality is unchanged; all 5 synthetic misses are still in one scanned PDF (syn_038). Latency: LangGraph's own
+  overhead is 0.023 s per report (p50; total minus the node timings) and LLM time is unchanged (p50 8.0 s). The rest
+  of the difference is machine load on the CPU stages: extraction + findings took 0.38 s both called directly and
+  inside the graph at the same moment, vs 0.11 s on 2026-09-28.

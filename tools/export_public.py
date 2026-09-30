@@ -31,7 +31,7 @@ ALLOW = [
     # app
     "config.py", "pipeline.py", "pdf_utils.py", "ocr.py", "abnormal.py", "conditions.py",
     "llm.py", "verify.py", "retrieval.py", "kb_index.py", "embeddings.py", "web_fallback.py",
-    "storage.py", "ui.py", "graph_workflow.py", "report_cache.py",
+    "storage.py", "ui.py", "graph_workflow.py", "report_cache.py", "batch.py",
     # optional LangChain adapter + runnable examples
     "integrations/**", "examples/**", "requirements-langchain.txt",
     # data that is ours
@@ -55,6 +55,11 @@ DENY_PATHS = ["data/knowledge_base.json", "data/brand_terms.txt", "data/checkite
 _DENY_B64 = ["SDJV", "5pep5a6J5YGl5bq3", "Q2hlY2tSZXBvcnREZXRhaWw=", "L2hvbWUvdG9ueQ==",
              "cmFnX2Zyb21fY2xhdWRl", "Wmh1XzA0MjA=", "5rC45oKF"]
 DENY = [base64.b64decode(x).decode("utf-8") for x in _DENY_B64]
+# The employer may be named in exactly one place: the READMEs' attribution paragraph
+# ("**Background.** ..." / "**背景**..."), which is removed before scanning. Anywhere else,
+# including the rest of a README, a denylisted name still blocks the export.
+ATTRIBUTION = re.compile(r"^\*\*(?:Background\.|背景)\*\*.*?(?:\n[ \t]*\n|\Z)", re.S | re.M)
+ATTRIBUTION_FILES = {"README.md", "README.zh-TW.md"}
 TEXT_EXT = {".py", ".json", ".md", ".txt", ".yml", ".yaml", ".toml", ".ps1", ".sh", ".cfg",
             ".csv", ".html", ".css", ".js", ""}
 
@@ -100,6 +105,8 @@ def scan(dest: Path) -> list[str]:
     for rel, t in texts.items():
         if rel == "tools/export_public.py":
             continue
+        if rel in ATTRIBUTION_FILES:
+            t = ATTRIBUTION.sub("", t, count=1)
         low = t.lower()
         for d in DENY:
             if d.lower() in low:

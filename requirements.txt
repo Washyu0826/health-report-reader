@@ -1,4 +1,4 @@
-# Core runtime (CPU-only is fine; inference runs in Ollama)
+# Core runtime (CPU-only is fine; inference runs in Ollama). LangGraph orchestrates the pipeline.
 gradio==6.28.0
 requests==2.33.1
 pdfplumber==0.11.9
@@ -11,3 +11,4 @@ pandas==3.0.2
 pillow==12.2.0
 jieba==0.42.1
 bm25s==0.3.11
+langgraph==1.2.12

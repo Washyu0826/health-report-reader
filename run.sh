@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-echo "=== Health Report Tagger Setup ==="
+echo "=== Health Report Reader Setup ==="
 
 # 1. Python venv
 if [ ! -d ".venv" ]; then

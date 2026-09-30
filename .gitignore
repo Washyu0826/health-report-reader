@@ -30,3 +30,6 @@ data/brand_terms.txt
 eval/_chroma_bench/
 .ruff_cache/
 eval/_chroma*/
+
+# batch.py default output (may hold results of private reports)
+batch_out/

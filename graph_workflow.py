@@ -1,21 +1,26 @@
 """
-graph_workflow.py — LangGraph "generate -> verify -> rewrite" workflow (R6).
-
-Same stages as pipeline.analyze_pdf (the functions are shared, not copied),
-but orchestrated as a LangGraph StateGraph with one extra loop:
+graph_workflow.py — The tagging workflow as a LangGraph StateGraph (the only
+orchestration path: pipeline.analyze_pdf runs it; UI, eval and integrations use it).
 
     extract -> detect_abnormal -> {derive_rules || retrieve} -> generate
             -> merge_rules -> verify --(unsupported & round < MAX)--> rewrite -> verify
                                      \\-> finalize
 
-Why: the linear pipeline DROPS advice tags whose cited passage does not
+The nodes call the stage functions in pipeline.py and the hand-built pieces
+(rules, schema-constrained generation, claim verification) — the graph owns
+control flow, state, progress events and streaming, not the logic.
+
+Rewrite loop (R8): the default drops advice tags whose cited passage does not
 support them (measured: 39/143 KB-cited tags on 12 internal reports, with a
-bias against biomarker-fact-sheet citations). Here unsupported tags go to ONE
-batched, schema-constrained rewrite call that may (a) revise the tag so a
-passage the model was shown supports it, (b) re-cite a better retrieved
-passage, or (c) drop it. Revised tags are verified again; whatever is still
-unsupported after MAX_REWRITES rounds is dropped. Every decision is logged
+bias against biomarker-fact-sheet citations). With rewrite on, unsupported
+tags go to ONE batched, schema-constrained rewrite call that may (a) revise
+the tag so a passage the model was shown supports it, (b) re-cite a better
+retrieved passage, or (c) drop it. Revised tags are verified again; whatever is
+still unsupported after MAX_REWRITES rounds is dropped. Every decision is logged
 (`rewrite_log`) for the UI and the eval.
+
+Privacy: LangSmith tracing is forced off for every run (a trace would carry the
+report text off the machine); tests/test_graph_workflow.py checks it.
 
 The LLM-facing callables (generate / judge / rewrite) are injectable so the
 graph is testable without Ollama (tests/test_graph_workflow.py).
@@ -31,10 +36,16 @@ from __future__ import annotations
 
 import operator
 import time
+import uuid
+from collections import OrderedDict
 from dataclasses import dataclass, field
 from typing import Annotated, Any, Callable, Dict, List, Optional, Tuple
 
+from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.config import get_stream_writer
 from langgraph.graph import END, START, StateGraph
+from langgraph.types import Command, interrupt
+from langsmith import tracing_context
 from typing_extensions import TypedDict
 
 import config
@@ -54,6 +65,10 @@ REWRITE_MAX_CHARS = 16
 # Only advice is rewritten; an unsupported KB-cited condition/risk is dropped as before
 # (the smoke run turned a risk tag into advice when allowed to rewrite it).
 REWRITE_KEYS = ADVICE_KEYS
+# What a nurse review can remove: the rule-derived tags (conditions.derive).
+RULE_KEYS = ("conditions", "risks")
+# Paused review runs kept in memory (never on disk: the state holds the report text).
+MAX_PAUSED = 16
 
 GenerateFn = Callable[..., Tuple[Dict, str]]                    # llm.analyze_report signature
 JudgeFn = Callable[[List[Dict]], List[Optional[bool]]]           # verify.llm_support_judge()
@@ -89,6 +104,7 @@ class GraphState(TypedDict, total=False):
     verification: Dict          # first-pass verify_tags stats (+ "rewrite" block at finalize)
     rewrite_round: int
     rewrite_log: List[Dict]
+    review: Dict                # nurse review: {"removed": {...}, "kept": {...}} (review=True only)
     error: str
     error_stage: str
     timing: Annotated[Dict[str, float], _sum_timings]
@@ -111,6 +127,9 @@ class GraphDeps:
     web: Any = None
     rewrite: bool = config.VERIFY_REWRITE
     max_rewrites: int = MAX_REWRITES
+    run_llm: bool = True        # False: stop after retrieval (no model needed)
+    review: bool = False        # pause for a human review of the rule conditions/risks
+    stream_llm: bool = False    # emit the LLM's partial JSON as "custom" stream events
     generate_fn: GenerateFn = analyze_report
     judge: Optional[JudgeFn] = None
     rewrite_fn: Optional[RewriteFn] = None
@@ -202,7 +221,7 @@ def _strip_internal(tag: Dict) -> Dict:
     return {k: v for k, v in tag.items() if not k.startswith("_")}
 
 
-def build_graph(deps: GraphDeps):
+def build_graph(deps: GraphDeps, checkpointer=None):
     judge = deps.judge or (llm_support_judge(deps.model, deps.base_url) if deps.verify else None)
     rewrite_fn = deps.rewrite_fn or ollama_rewriter(deps.model, deps.base_url)
 
@@ -231,17 +250,45 @@ def build_graph(deps: GraphDeps):
                 "cited_ids": cited_ids}
 
     def generate(state: GraphState) -> Dict:
+        if not deps.run_llm:
+            return {}
+        kw = {}
+        if deps.stream_llm:  # partial JSON -> stream_mode="custom" -> run_graph(on_llm_text=...)
+            writer = get_stream_writer()
+            kw["on_text"] = lambda raw: writer({"llm_text": raw})
         tags, err = deps.generate_fn(
             text=state["text"], context=state["context_text"],
             findings_text=findings_prompt(state["findings"], state["rules"]),
             model=deps.model, base_url=deps.base_url, chunk_ids=state["cited_ids"],
-            findings=state["findings"], rules_cover_labs=deps.use_rules)
+            findings=state["findings"], rules_cover_labs=deps.use_rules, **kw)
         if err:
             return {"tags": tags or {}, "error": err, "error_stage": "llm", "errors": [err]}
         return {"tags": tags}
 
+    def review(state: GraphState) -> Dict:
+        # Human-in-the-loop: before any advice is written, a nurse confirms the rule-derived
+        # conditions/risks and can remove false positives. interrupt() pauses the run (state is
+        # kept by the in-memory checkpointer); the node re-runs from the top on resume, and
+        # everything before interrupt() is side-effect free.
+        rules = state.get("rules") or {}
+        if not deps.review or not any(rules.get(k) for k in RULE_KEYS):
+            return {}
+        decision = interrupt({k: [{"text": t["text"], "evidence": t.get("evidence", "")}
+                                  for t in rules.get(k, [])] for k in RULE_KEYS})
+        asked = ((decision or {}).get("remove") or {}) if isinstance(decision, dict) else {}
+        removed = {k: sorted({str(x) for x in asked.get(k, [])} & {t["text"] for t in rules.get(k, [])})
+                   for k in RULE_KEYS}
+        kept = {k: [t for t in rules.get(k, []) if t["text"] not in removed[k]] for k in RULE_KEYS}
+        return {"rules": kept, "review": {"removed": removed,
+                                          "kept": {k: [t["text"] for t in v] for k, v in kept.items()}}}
+
     def merge_rules(state: GraphState) -> Dict:
-        return {"tags": merge_rule_tags(dict(state["tags"]), state["rules"])}
+        tags = merge_rule_tags(dict(state["tags"]), state["rules"])
+        removed = (state.get("review") or {}).get("removed") or {}
+        for k, texts in removed.items():  # a reviewer's removal also holds against the LLM's own tags
+            if texts:
+                tags[k] = [t for t in tags.get(k, []) if t["text"] not in texts]
+        return {"tags": tags}
 
     def verify(state: GraphState) -> Dict:
         rnd = state.get("rewrite_round", 0)
@@ -343,7 +390,7 @@ def build_graph(deps: GraphDeps):
         return "finalize" if state.get("error") else "detect_abnormal"
 
     def after_generate(state: GraphState) -> str:
-        return "finalize" if state.get("error") else "merge_rules"
+        return "finalize" if state.get("error") or not deps.run_llm else "merge_rules"
 
     def after_merge(state: GraphState) -> str:
         return "verify" if deps.verify else "finalize"
@@ -358,7 +405,7 @@ def build_graph(deps: GraphDeps):
     g = StateGraph(GraphState)
     for name, key, fn in [("extract", "extract_s", extract), ("detect_abnormal", "abnormal_s", detect_abnormal),
                           ("derive_rules", "rules_s", derive_rules), ("retrieve", "retrieve_s", retrieve),
-                          ("generate", "llm_s", generate), ("merge_rules", "merge_s", merge_rules),
+                          ("review", "review_s", review), ("generate", "llm_s", generate), ("merge_rules", "merge_s", merge_rules),
                           ("verify", "verify_s", verify), ("rewrite", "rewrite_s", rewrite),
                           ("finalize", "finalize_s", finalize)]:
         g.add_node(name, _timed(name, key, fn))
@@ -366,13 +413,14 @@ def build_graph(deps: GraphDeps):
     g.add_conditional_edges("extract", after_extract, ["detect_abnormal", "finalize"])
     g.add_edge("detect_abnormal", "derive_rules")       # fan-out: both branches run in one superstep
     g.add_edge("detect_abnormal", "retrieve")
-    g.add_edge(["derive_rules", "retrieve"], "generate")  # fan-in: waits for both
+    g.add_edge(["derive_rules", "retrieve"], "review")    # fan-in: waits for both
+    g.add_edge("review", "generate")                      # pass-through unless deps.review
     g.add_conditional_edges("generate", after_generate, ["merge_rules", "finalize"])
     g.add_conditional_edges("merge_rules", after_merge, ["verify", "finalize"])
     g.add_conditional_edges("verify", after_verify, ["rewrite", "finalize"])
     g.add_edge("rewrite", "verify")
     g.add_edge("finalize", END)
-    return g.compile()
+    return g.compile(checkpointer=checkpointer)
 
 
 # ─── Entry point ─────────────────────────────────────────────────────────────
@@ -381,6 +429,33 @@ def build_graph(deps: GraphDeps):
 class GraphResult(PipelineResult):
     rewrite_log: List[Dict] = field(default_factory=list)
     node_trace: List[str] = field(default_factory=list)
+    # review=True: while paused, {"token", "conditions": [...], "risks": [...]} (resume with
+    # resume_review); after resuming, `review` = {"removed": {...}, "kept": {...}}.
+    pending_review: Dict = field(default_factory=dict)
+    review: Dict = field(default_factory=dict)
+
+
+def _result(state: Dict, run_llm: bool = True, into: Optional[GraphResult] = None) -> GraphResult:
+    """Graph state -> GraphResult. `into` is updated in place: run_graph passes the same
+    object to every on_stage call and returns it, like the linear pipeline did, so
+    anything a hook records on it (e.g. the UI's timing["first_result_s"]) is kept."""
+    r = into if into is not None else GraphResult()
+    r.text, r.tables = state.get("text", ""), state.get("tables", [])
+    r.used_ocr = state.get("used_ocr", False)
+    r.findings, r.abnormal_debug = state.get("findings", []), state.get("abnormal_debug", {})
+    r.rules = state.get("rules", {})
+    r.sex = state.get("sex")
+    r.chunks, r.rag_debug = state.get("chunks", []), state.get("rag_debug", {})
+    r.cited_ids = state.get("cited_ids", []) if run_llm else []  # = what the LLM was allowed to cite
+    r.tags = state.get("tags", {}) if not state.get("error") or state.get("error_stage") != "llm" else {}
+    r.error, r.error_stage = state.get("error", ""), state.get("error_stage", "")
+    r.timing = {**r.timing, **state.get("timing", {})}
+    if not run_llm:
+        r.timing.pop("llm_s", None)  # the generate node ran as a no-op
+    r.rewrite_log = state.get("rewrite_log", [])
+    r.node_trace = state.get("trace", [])
+    r.review = state.get("review", {})
+    return r
 
 
 def run_graph(
@@ -401,12 +476,29 @@ def run_graph(
     judge: Optional[JudgeFn] = None,
     rewrite_fn: Optional[RewriteFn] = None,
     on_update: Optional[Callable[[str, Dict], None]] = None,
+    run_llm: bool = True,
+    on_stage: Optional[Callable[[str, PipelineResult], None]] = None,
+    on_llm_text: Optional[Callable[[str], None]] = None,
+    review: bool = False,
 ) -> GraphResult:
-    """Graph version of pipeline.analyze_pdf (same arguments, same result shape,
-    plus `rewrite_log` and `node_trace`). rewrite=None -> config.VERIFY_REWRITE
-    (default OFF: drop unsupported advice, the linear pipeline's behaviour);
-    rewrite=True enables the generate -> verify -> rewrite loop.
-    on_update(node, update) is called as each node finishes (UI progress)."""
+    """Run the tagging graph on one PDF (pipeline.analyze_pdf delegates here).
+
+    rewrite=None -> config.VERIFY_REWRITE (default OFF: unsupported advice is
+    dropped); rewrite=True enables the generate -> verify -> rewrite loop.
+    run_llm=False stops after retrieval (extraction, findings, rules, chunks).
+    on_update(node, update): called as each node finishes.
+    on_stage(stage, partial_result): progress hook with the linear pipeline's
+      stages — "extract" (starting), "findings" (findings + rules ready: the
+      first useful result), "retrieve", "llm" (starting), "verify" (starting),
+      and "rewrite" when the rewrite loop runs. Treat the result as read-only.
+    on_llm_text(raw): the LLM's JSON so far, streamed while it is generated.
+    review=True: when the rules flag any condition/risk, the run pauses before
+      the LLM (LangGraph interrupt) and returns with `pending_review` set; call
+      resume_review(token, decision) to continue. Nothing is paused when the
+      rules flag nothing.
+
+    LangSmith tracing is disabled for the whole run regardless of environment
+    variables: a trace would carry the report text off the machine."""
     deps = GraphDeps(
         checkitem_lookup=checkitem_lookup if checkitem_lookup is not None
         else load_checkitem_lookup(config.REFERENCE_RANGES_PATH),
@@ -414,33 +506,102 @@ def run_graph(
         model=model, base_url=base_url, sex=sex, verify=verify, use_rules=use_rules, ocr=ocr,
         llm_normalize=llm_normalize, web=web,
         rewrite=config.VERIFY_REWRITE if rewrite is None else rewrite, max_rewrites=max_rewrites,
+        run_llm=run_llm, stream_llm=on_llm_text is not None, review=review,
         generate_fn=generate_fn or analyze_report, judge=judge, rewrite_fn=rewrite_fn)
-    graph = build_graph(deps)
-    # supersteps: extract, detect, rules||retrieve, generate, merge, verify, 2 per rewrite round, finalize
-    limit = 12 + 2 * max(0, max_rewrites)
-    state: Dict = {}
-    for mode, chunk in graph.stream({"pdf_bytes": pdf_bytes, "rewrite_round": 0, "rewrite_log": []},
-                                    {"recursion_limit": limit}, stream_mode=["updates", "values"]):
-        if mode == "values":
-            state = chunk
-        elif on_update:
-            for node, update in chunk.items():
-                on_update(node, update or {})
+    checkpointer = InMemorySaver() if review else None  # interrupt() needs one; memory only
+    graph = build_graph(deps, checkpointer=checkpointer)
+    # supersteps: extract, detect, rules||retrieve, review, generate, merge, verify, 2 per rewrite round, finalize
+    cfg: Dict = {"recursion_limit": 13 + 2 * max(0, max_rewrites)}
+    if review:
+        cfg["configurable"] = {"thread_id": uuid.uuid4().hex}
+    result = GraphResult()
+    state, pending = _drive(graph, {"pdf_bytes": pdf_bytes, "rewrite_round": 0, "rewrite_log": []}, cfg,
+                            run_llm, result, {}, on_update, on_stage, on_llm_text)
+    _result(state, run_llm, into=result)
+    if pending is not None:
+        token = cfg["configurable"]["thread_id"]
+        _PAUSED[token] = _Paused(graph, cfg, deps, result)
+        while len(_PAUSED) > MAX_PAUSED:  # abandoned reviews: drop the oldest
+            _PAUSED.popitem(last=False)
+        result.pending_review = {"token": token, **pending}
+    return result
 
-    r = GraphResult()
-    r.text, r.tables = state.get("text", ""), state.get("tables", [])
-    r.used_ocr = state.get("used_ocr", False)
-    r.findings, r.abnormal_debug = state.get("findings", []), state.get("abnormal_debug", {})
-    r.rules = state.get("rules", {})
-    r.sex = state.get("sex")
-    r.chunks, r.rag_debug = state.get("chunks", []), state.get("rag_debug", {})
-    r.cited_ids = state.get("cited_ids", [])
-    r.tags = state.get("tags", {}) if not state.get("error") or state.get("error_stage") != "llm" else {}
-    r.error, r.error_stage = state.get("error", ""), state.get("error_stage", "")
-    r.timing = dict(state.get("timing", {}))
-    r.rewrite_log = state.get("rewrite_log", [])
-    r.node_trace = state.get("trace", [])
+
+@dataclass
+class _Paused:
+    graph: Any
+    cfg: Dict
+    deps: GraphDeps
+    result: GraphResult
+
+
+_PAUSED: "OrderedDict[str, _Paused]" = OrderedDict()
+
+
+def resume_review(token: str, decision: Dict,
+                  on_update: Optional[Callable[[str, Dict], None]] = None,
+                  on_stage: Optional[Callable[[str, PipelineResult], None]] = None,
+                  on_llm_text: Optional[Callable[[str], None]] = None) -> GraphResult:
+    """Continue a run paused for review. decision = {"remove": {"conditions": [text, ...],
+    "risks": [text, ...]}} (texts from result.pending_review). Returns the same result object
+    run_graph returned, now complete, with `review` = what was removed / kept. KeyError for an
+    unknown or already-used token."""
+    p = _PAUSED.pop(token)
+    p.deps.stream_llm = on_llm_text is not None
+    state = dict(p.graph.get_state(p.cfg).values)
+    state, pending = _drive(p.graph, Command(resume=decision), p.cfg, p.deps.run_llm, p.result, state,
+                            on_update, on_stage, on_llm_text)
+    r = _result(state, p.deps.run_llm, into=p.result)
+    r.pending_review = {}
     return r
+
+
+def discard_review(token: str) -> bool:
+    """Forget a paused run (its state, including the report text, is released)."""
+    return _PAUSED.pop(token, None) is not None
+
+
+def _drive(graph, inp, cfg: Dict, run_llm: bool, result: GraphResult, state: Dict,
+           on_update, on_stage, on_llm_text) -> Tuple[Dict, Optional[Dict]]:
+    """Stream one leg of a run (start or resume) -> (final state, interrupt payload or None).
+    Stage hooks come from task start/finish events, LLM text from "custom" events."""
+    modes = ["values", "updates"] + (["tasks"] if on_stage else []) + (["custom"] if on_llm_text else [])
+    box: Dict = {"state": state, "pending": None}
+    emitted: set = set()
+
+    def stage(name: str, **extra) -> None:
+        if on_stage and name not in emitted:
+            emitted.add(name)
+            on_stage(name, _result({**box["state"], **extra}, run_llm, into=result))
+
+    def on_task(ev: Dict) -> None:
+        name, started = ev["name"], "input" in ev
+        if started and name in ("extract", "verify", "rewrite"):
+            stage(name)
+        elif started and name == "generate" and run_llm:
+            stage("llm")
+        elif not started and name == "derive_rules" and not ev.get("error"):
+            # detect_abnormal's findings are already in the state; rules come with this event.
+            # retrieve started in the same superstep; announcing it here keeps the pipeline's order.
+            stage("findings", **(ev.get("result") or {}))
+            stage("retrieve")
+
+    with tracing_context(enabled=False):
+        for mode, chunk in graph.stream(inp, cfg, stream_mode=modes):
+            if mode == "values":
+                box["state"] = {k: v for k, v in chunk.items() if k != "__interrupt__"}
+            elif mode == "tasks":
+                on_task(chunk)
+            elif mode == "custom":
+                if isinstance(chunk, dict) and "llm_text" in chunk:
+                    on_llm_text(chunk["llm_text"])
+            else:
+                for node, update in chunk.items():
+                    if node == "__interrupt__":
+                        box["pending"] = dict(update[0].value) if update else {}
+                    elif on_update:
+                        on_update(node, update or {})
+    return box["state"], box["pending"]
 
 
 def mermaid(deps: Optional[GraphDeps] = None) -> str:
@@ -462,6 +623,9 @@ if __name__ == "__main__":
         "# Tagging workflow (LangGraph)\n\n"
         "Generated by `python graph_workflow.py --mermaid docs/graph.md` from the compiled graph.\n"
         "Dashed edges are conditional. `derive_rules` and `retrieve` run in the same superstep;\n"
+        "`review` is a pass-through unless `run_graph(review=True)`: then, when the rules flag any\n"
+        "condition or risk, the run pauses there (LangGraph `interrupt`, in-memory checkpointer) until\n"
+        "`resume_review()` passes a nurse's decision, before any advice is generated.\n"
         "`verify -> rewrite -> verify` runs at most `MAX_REWRITES` (1) times, then anything still\n"
         "unsupported is dropped in `finalize`. The rewrite loop is **off by default**\n"
         "(`config.VERIFY_REWRITE=0`; enable with `VERIFY_REWRITE=1` or `run_graph(rewrite=True)`): on the\n"

@@ -1,6 +1,5 @@
-# Optional LangChain / LangGraph adapter (integrations/langchain, examples/).
-# The core pipeline does not need any of these.
+# Optional LangChain adapter (integrations/langchain, examples/). LangGraph itself is a core
+# dependency (requirements.txt).
 -r requirements.txt
 langchain-core==1.6.5
 langchain-ollama==1.1.0
-langgraph==1.2.12

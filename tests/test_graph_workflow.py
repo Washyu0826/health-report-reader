@@ -303,3 +303,143 @@ def test_echoed_revision_is_not_reverified():
     r = run({"food": [BAD + "1"]}, rewriter=rw)
     assert texts(r, "food") == [] and r.rewrite_log[0]["action"] == "unchanged"
     assert r.node_trace.count("verify") == 2      # loop still closes; nothing left to re-check
+
+
+# ─── single orchestration path: pipeline.analyze_pdf runs this graph ─────────
+
+def test_analyze_pdf_runs_the_graph():
+    r = analyze_pdf(PDF.read_bytes(), run_llm=False, ocr=False)
+    assert r.node_trace[0] == "extract" and r.node_trace[-1] == "finalize"
+    assert r.findings and r.chunks
+    assert r.tags == {} and r.cited_ids == [] and "llm_s" not in r.timing   # generate was a no-op
+
+
+def test_on_stage_order_and_one_result_object():
+    seen, objs = [], []
+
+    def on_stage(stage, r):
+        seen.append((stage, len(r.findings), bool(r.rules)))
+        objs.append(r)
+        if stage == "findings":
+            r.timing["hook_mark"] = 1.0   # the UI records timing["first_result_s"] this way
+    r = run_graph(PDF.read_bytes(), ocr=False, generate_fn=fake_generate({"food": [GOOD]}), judge=judge,
+                  on_stage=on_stage)
+    assert [s for s, *_ in seen] == ["extract", "findings", "retrieve", "llm", "verify"]
+    assert seen[1][1] > 0 and seen[1][2]              # findings + rule tags ready at "findings"
+    assert all(o is r for o in objs) and r.timing["hook_mark"] == 1.0
+
+
+def test_llm_text_is_streamed_through_the_graph():
+    got = []
+
+    def gen(**kw):
+        kw["on_text"]('{"summary": "a')
+        kw["on_text"]('{"summary": "ab"')
+        return fake_generate({"food": [GOOD]})(**kw)
+    run_graph(PDF.read_bytes(), ocr=False, generate_fn=gen, judge=judge, on_llm_text=got.append)
+    assert got == ['{"summary": "a', '{"summary": "ab"']
+
+
+def test_no_stream_callback_means_no_on_text():
+    seen = {}
+
+    def gen(**kw):
+        seen.update(kw)
+        return fake_generate({"food": [GOOD]})(**kw)
+    run_graph(PDF.read_bytes(), ocr=False, generate_fn=gen, judge=judge)
+    assert "on_text" not in seen
+
+
+def test_langsmith_tracing_is_forced_off(monkeypatch):
+    """A LangSmith trace would carry the report text off the machine, so run_graph turns
+    tracing off even when the environment turns it on. (Measured: with LANGSMITH_TRACING=true
+    and no guard, LangGraph POSTs the run to the tracing endpoint.)"""
+    lu = pytest.importorskip("langsmith.utils")
+    monkeypatch.setenv("LANGSMITH_TRACING", "true")
+    monkeypatch.setenv("LANGSMITH_API_KEY", "lsv2_pt_fake")
+    lu.get_env_var.cache_clear()
+    try:
+        assert lu.tracing_is_enabled()                # control: the environment asks for tracing
+        seen = []
+
+        def gen(**kw):
+            seen.append(lu.tracing_is_enabled())
+            return fake_generate({"food": [GOOD]})(**kw)
+        run_graph(PDF.read_bytes(), ocr=False, generate_fn=gen, judge=judge)
+        assert seen == [False]
+    finally:
+        monkeypatch.undo()
+        lu.get_env_var.cache_clear()
+
+
+# ─── nurse review (LangGraph interrupt) ──────────────────────────────────────
+
+NORMAL_PDF = ROOT / "eval" / "synth" / "samples" / "syn_001.pdf"   # all normal: no rule tags
+
+
+def test_review_off_by_default_never_pauses():
+    r = run_graph(PDF.read_bytes(), ocr=False, generate_fn=fake_generate({"food": [GOOD]}), judge=judge)
+    assert r.pending_review == {} and r.review == {} and r.tags
+
+
+def test_review_pauses_before_the_llm_and_resumes_without_removed_items():
+    import graph_workflow
+    calls = []
+
+    def gen(**kw):
+        calls.append(kw["findings_text"])
+        out, err = fake_generate({"food": [GOOD]})(**kw)
+        out["conditions"] = [{"text": "過重", "src": "report", "conf": 0.9}]  # LLM repeats a removed one
+        return out, err
+    r = run_graph(PDF.read_bytes(), ocr=False, generate_fn=gen, judge=judge, review=True)
+    p = r.pending_review
+    assert p["token"] and not calls and r.tags == {}                    # paused before generate
+    assert "過重" in [c["text"] for c in p["conditions"]] and p["conditions"][0]["evidence"]
+    assert r.findings and r.rules["conditions"]                          # findings/rules already shown
+
+    r2 = graph_workflow.resume_review(p["token"], {"remove": {"conditions": ["過重", "not-a-tag"],
+                                                             "risks": ["痛風"]}})
+    assert r2 is r and r2.pending_review == {}
+    assert "過重" not in texts(r2, "conditions") and "痛風" not in texts(r2, "risks")
+    assert "血脂異常" in texts(r2, "conditions") and texts(r2, "food") == [GOOD]
+    assert r2.review["removed"] == {"conditions": ["過重"], "risks": ["痛風"]}   # unknown text ignored
+    assert "過重" not in calls[0]                                        # the LLM never saw it
+    assert token_is_released(p["token"])
+
+
+def token_is_released(token):
+    import graph_workflow
+    return token not in graph_workflow._PAUSED
+
+
+def test_review_with_nothing_flagged_does_not_pause():
+    def gen(**kw):  # an all-normal report retrieves no chunks, so cite nothing
+        return {"summary": "s", "conditions": [], "risks": [], "metrics": [], "lifestyle": [],
+                "food": [], "exercise": [], "supplements": [], "avoid": []}, ""
+    r = run_graph(NORMAL_PDF.read_bytes(), ocr=False, generate_fn=gen, judge=judge, review=True)
+    assert r.pending_review == {} and r.tags["summary"] == "s"
+
+
+def test_resume_streams_the_remaining_stages():
+    import graph_workflow
+    first, second, text = [], [], []
+    r = run_graph(PDF.read_bytes(), ocr=False, judge=judge, review=True,
+                  generate_fn=fake_generate({"food": [GOOD]}), on_stage=lambda s, _: first.append(s))
+
+    def gen(**kw):
+        kw["on_text"]('{"summary": "x"')
+        return fake_generate({"food": [GOOD]})(**kw)
+    graph_workflow._PAUSED[r.pending_review["token"]].deps.generate_fn = gen
+    graph_workflow.resume_review(r.pending_review["token"], {"remove": {}},
+                                 on_stage=lambda s, _: second.append(s), on_llm_text=text.append)
+    assert first == ["extract", "findings", "retrieve"] and second == ["llm", "verify"]
+    assert text == ['{"summary": "x"']
+
+
+def test_resume_unknown_token_and_discard():
+    import graph_workflow
+    with pytest.raises(KeyError):
+        graph_workflow.resume_review("nope", {})
+    r = run_graph(PDF.read_bytes(), ocr=False, generate_fn=fake_generate({}), judge=judge, review=True)
+    assert graph_workflow.discard_review(r.pending_review["token"]) is True
+    assert token_is_released(r.pending_review["token"])

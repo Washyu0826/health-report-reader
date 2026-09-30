@@ -116,3 +116,50 @@ def test_report_date_extraction():
     assert ui.report_date_from_text("出生日期 1967-01-01 檢查日期 2025-09-21") == "2025-09-21"
     assert ui.report_date_from_text("受檢日期：113/05/02") == "2024-05-02"
     assert ui.report_date_from_text("出生日期 1967-01-01") is None
+
+
+# ─── nurse review (demo-stub mode) ───────────────────────────────────────────
+
+REVIEW_SAMPLE = ROOT / "eval" / "synth" / "samples" / "syn_002.pdf"   # several rule conditions
+
+
+def test_review_pauses_then_resumes_without_the_removed_condition(res, tmp_path):
+    if not REVIEW_SAMPLE.exists():
+        pytest.skip("synthetic sample PDFs not generated")
+    db = str(tmp_path / "runs.sqlite3")
+    stages, partials = [], []
+    a = ui.run_analysis(REVIEW_SAMPLE.read_bytes(), res, runs_db=db, review=True,
+                        on_stage=stages.append, on_partial=partials.append)
+    assert a.paused and not a.cached and stages == ["extract", "abnormal", "retrieve"]
+    assert partials and a.tags["conditions"]                          # findings + rules already shown
+    choices, values = ui.review_choices(a)
+    assert len(choices) == len(values) and "conditions::過重" in values
+    keep = [v for v in values if v not in ("conditions::過重", "risks::痛風")]
+
+    more = []
+    final = ui.resume_analysis(a, keep, res, on_stage=more.append)
+    assert not final.paused and more[-1] == "verify"
+    conds = [t["text"] for t in final.tags["conditions"]]
+    assert "過重" not in conds and "血脂異常" in conds
+    assert "痛風" not in [t["text"] for t in final.tags["risks"]]
+    assert final.result.review["removed"] == {"conditions": ["過重"], "risks": ["痛風"]}
+    assert "護理師審核" in ui.render_audit(final) and "過重" in ui.render_audit(final)
+    assert ui.export_dict(final)["review"]["removed"]["conditions"] == ["過重"]
+    with pytest.raises(ValueError):
+        ui.resume_analysis(final, keep, res)                          # nothing left to resume
+
+
+def test_review_mode_bypasses_the_report_cache(res, tmp_path, monkeypatch):
+    if not REVIEW_SAMPLE.exists():
+        pytest.skip("synthetic sample PDFs not generated")
+    from report_cache import ReportCache
+    res.cache, old = ReportCache(str(tmp_path / "cache"), enabled=True), res.cache
+    try:
+        monkeypatch.setattr(res.cache, "get", lambda k: pytest.fail("cache read in review mode"))
+        a = ui.run_analysis(REVIEW_SAMPLE.read_bytes(), res, runs_db=str(tmp_path / "r.db"), review=True)
+        final = ui.resume_analysis(a, ui.review_choices(a)[1], res)     # keep everything
+        assert final.result.review["removed"] == {"conditions": [], "risks": []}
+        assert "全部保留" in ui.render_audit(final)
+        assert not list((tmp_path / "cache").glob("*.json"))
+    finally:
+        res.cache = old

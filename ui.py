@@ -52,6 +52,9 @@ import config
 import conditions as cond_rules
 import storage
 from abnormal import load_checkitem_lookup
+# Imported at start-up (not lazily by analyze_pdf): loading LangGraph takes ~1.2 s,
+# which the first report would otherwise pay.
+from graph_workflow import resume_review
 from llm import metrics_from_findings, partial_tags, warmup
 from pipeline import PipelineResult, analyze_pdf
 from report_cache import ReportCache, cache_key, config_fingerprint
@@ -66,7 +69,7 @@ SAMPLES_DIR = ROOT / "eval" / "synth" / "samples"
 RUNS_DB = str(Path(config.CHROMA_DB_PATH) / "runs.sqlite3")
 MAX_PDF_BYTES = 20 * 1024 * 1024
 
-TITLE = "健檢報告標籤器 Health Report Tagger"
+TITLE = "健檢報告解讀器 Health Report Reader"
 DISCLAIMER = "本工具僅供健康資訊參考，不能取代醫師診斷。"
 
 # Curated synthetic samples (fully synthetic, safe to ship).
@@ -223,7 +226,7 @@ def stub_tags(r: PipelineResult) -> Dict:
     findings; advice tags are canned but cite real fact-sheet chunks and are
     passed through the real verifier (without the LLM judge).
     """
-    rules = cond_rules.derive(r.findings, r.sex)
+    rules = r.rules or cond_rules.derive(r.findings, r.sex)  # r.rules: after any nurse review
     tags: Dict[str, List[Dict]] = {k: [] for k, _, _ in CATEGORIES}
     tags["conditions"], tags["risks"] = rules["conditions"], rules["risks"]
     tags["metrics"] = metrics_from_findings(r.findings)
@@ -296,6 +299,8 @@ class Analysis:
     patient_id: str = ""
     cached: bool = False               # served from the report cache
     preliminary: bool = False          # partial view while the LLM is still running
+    paused: bool = False               # waiting for a nurse review (resume_analysis)
+    resume_ctx: Dict = field(default_factory=dict)
 
 
 def preliminary_tags(r: PipelineResult, llm_raw: str = "") -> Dict:
@@ -326,17 +331,21 @@ def run_analysis(pdf_bytes: bytes, res: Resources, sex_choice: str = "", alias: 
                  on_stage: Optional[Callable[[str], None]] = None,
                  runs_db: str = RUNS_DB,
                  on_partial: Optional[Callable[["Analysis"], None]] = None,
-                 use_cache: bool = True) -> Analysis:
+                 use_cache: bool = True, review: bool = False) -> Analysis:
     """on_stage(stage): stage names from STAGES as each one starts.
     on_partial(analysis): preliminary Analysis (preliminary=True) — first when
     findings + rule tags are ready, then as streamed LLM advice arrives.
-    use_cache: look up / store the result in res.cache (never with web search)."""
+    use_cache: look up / store the result in res.cache (never with web search
+    or review: a reviewed result depends on the reviewer's decisions).
+    review: pause before the LLM for a nurse review of the rule conditions/risks;
+    returns an Analysis with paused=True (continue with resume_analysis) unless
+    the rules flagged nothing."""
     on_stage = on_stage or (lambda s: None)
     if len(pdf_bytes) > MAX_PDF_BYTES:
         raise ValueError(f"檔案過大（上限 {MAX_PDF_BYTES // 1024 // 1024} MB）")
     sex = _parse_sex(sex_choice)
     t_all = time.time()
-    cache = res.cache if (use_cache and not allow_web) else None
+    cache = res.cache if (use_cache and not allow_web and not review) else None
     key = cache_key(pdf_bytes, _fingerprint(res, sex)) if cache else ""
     hit = cache.get(key) if cache else None
     if hit:
@@ -353,7 +362,12 @@ def run_analysis(pdf_bytes: bytes, res: Resources, sex_choice: str = "", alias: 
     if allow_web:  # the pipeline adds one web passage per abnormal finding
         web = (_MemoryWeb(search_fn=_stub_search) if res.stub else WebFallback())
 
-    r = _analyze_with_stages(pdf_bytes, res, retriever, sex, on_stage, web, on_partial, t_all)
+    r = _analyze_with_stages(pdf_bytes, res, retriever, sex, on_stage, web, on_partial, t_all, review=review)
+    if getattr(r, "pending_review", None):
+        a = Analysis(r, preliminary_tags(r), {}, dict(_NO_WEB), None, res.stub, paused=True)
+        a.resume_ctx = {"allow_web": allow_web, "web": web, "alias": alias, "report_date": report_date,
+                        "runs_db": runs_db, "first_leg_s": round(time.time() - t_all, 3)}
+        return a
     tags = r.tags
     if res.stub and not r.error:
         on_stage("verify")
@@ -393,13 +407,14 @@ def _finish(r: PipelineResult, tags: Dict, res: Resources, allow_web: bool, web,
 
 
 PARTIAL_EVERY_S = 0.4  # throttle for streamed-advice UI updates
+_NO_WEB = {"enabled": False, "sent": [], "cached": [], "blocked": 0}
 
 
-def _analyze_with_stages(pdf_bytes, res, retriever, sex, on_stage, web=None, on_partial=None,
-                         t0: Optional[float] = None) -> PipelineResult:
-    """Call pipeline.analyze_pdf, relaying its stage hooks to the UI; emits a
-    preliminary Analysis when findings + rules are ready and while the LLM streams."""
-    t0 = t0 or time.time()
+def _stage_hooks(res: "Resources", on_stage: Callable[[str], None],
+                 on_partial: Optional[Callable[["Analysis"], None]], t0: float):
+    """(on_stage hook, on_llm_text) for analyze_pdf / resume_review: relays stage
+    names to the UI and emits a preliminary Analysis when findings + rules are
+    ready and while the LLM streams."""
     stage_map = {"extract": "extract", "findings": "abnormal", "retrieve": "retrieve",
                  "llm": "llm", "verify": "verify"}
     box: Dict = {"r": None, "last": 0.0}
@@ -407,8 +422,7 @@ def _analyze_with_stages(pdf_bytes, res, retriever, sex, on_stage, web=None, on_
     def partial(r: PipelineResult, raw: str = "") -> None:
         if on_partial is None:
             return
-        a = Analysis(r, preliminary_tags(r, raw), {}, {"enabled": False, "sent": [], "cached": [],
-                                                       "blocked": 0}, None, res.stub, preliminary=True)
+        a = Analysis(r, preliminary_tags(r, raw), {}, dict(_NO_WEB), None, res.stub, preliminary=True)
         on_partial(a)
 
     def hook(stage: str, r: PipelineResult) -> None:
@@ -425,10 +439,59 @@ def _analyze_with_stages(pdf_bytes, res, retriever, sex, on_stage, web=None, on_
             box["last"] = now
             partial(box["r"], raw)
 
+    return hook, (on_text if on_partial else None)
+
+
+def _analyze_with_stages(pdf_bytes, res, retriever, sex, on_stage, web=None, on_partial=None,
+                         t0: Optional[float] = None, review: bool = False) -> PipelineResult:
+    """Call pipeline.analyze_pdf, relaying its stage hooks to the UI."""
+    hook, on_text = _stage_hooks(res, on_stage, on_partial, t0 or time.time())
     return analyze_pdf(pdf_bytes, res.lookup, retriever=retriever, run_llm=not res.stub,
                        ocr=not res.stub, sex=sex, model=config.LLM_MODEL,
                        base_url=config.OLLAMA_BASE_URL, web=web, on_stage=hook,
-                       on_llm_text=on_text if on_partial else None)
+                       on_llm_text=on_text, review=review)
+
+
+REVIEW_KEYS = (("conditions", "狀況"), ("risks", "風險"))
+
+
+def _review_value(key: str, text: str) -> str:
+    return f"{key}::{text}"
+
+
+def review_choices(a: Analysis) -> Tuple[List[Tuple[str, str]], List[str]]:
+    """(choices, values) for the review checklist: every rule condition/risk, all kept by default."""
+    pend = a.result.pending_review if a.paused else {}
+    choices = []
+    for key, label in REVIEW_KEYS:
+        for t in pend.get(key, []):
+            ev = f"（{t['evidence']}）" if t.get("evidence") else ""
+            choices.append((f"{label}｜{t['text']}{ev}", _review_value(key, t["text"])))
+    return choices, [v for _, v in choices]
+
+
+def resume_analysis(paused: Analysis, keep: List[str], res: "Resources",
+                    on_stage: Optional[Callable[[str], None]] = None,
+                    on_partial: Optional[Callable[["Analysis"], None]] = None) -> Analysis:
+    """Continue an analysis paused for nurse review. keep: the review_choices()
+    values left checked; every unchecked rule condition/risk is removed before
+    the LLM writes advice, and the decision is recorded (audit panel, JSON export)."""
+    if not paused.paused or not paused.result.pending_review:
+        raise ValueError("this analysis is not waiting for review")
+    on_stage = on_stage or (lambda s: None)
+    ctx, pend, kept = paused.resume_ctx, paused.result.pending_review, set(keep or [])
+    remove = {k: [t["text"] for t in pend.get(k, []) if _review_value(k, t["text"]) not in kept]
+              for k, _ in REVIEW_KEYS}
+    t0 = time.time()
+    hook, on_text = _stage_hooks(res, on_stage, on_partial, t0)
+    r = resume_review(pend["token"], {"remove": remove}, on_stage=hook, on_llm_text=on_text)
+    tags = r.tags
+    if res.stub and not r.error:
+        on_stage("verify")
+        tags = r.tags = stub_tags(r)
+    r.timing["total_s"] = round(ctx["first_leg_s"] + time.time() - t0, 3)  # excludes the review itself
+    return _finish(r, tags, res, ctx["allow_web"], ctx["web"], ctx["alias"], ctx["report_date"],
+                   report_date_from_text(r.text), ctx["runs_db"])
 
 
 # ─── Rendering (every dynamic string is html.escape'd) ───────────────────────
@@ -691,15 +754,26 @@ def render_perf(a: Analysis, res: Resources) -> str:
     return "".join(out)
 
 
+def render_review(a: Analysis) -> str:
+    rv = getattr(a.result, "review", None) or {}
+    if not rv:
+        return ""
+    removed = [(label, t) for k, label in REVIEW_KEYS for t in (rv.get("removed") or {}).get(k, [])]
+    body = ("刪除：" + "、".join(f"{esc(label)}「{esc(t)}」" for label, t in removed) + "。"
+            if removed else "全部保留，未刪除任何項目。")
+    return (f'<div class="cat-h">護理師審核</div><div>{body}被刪除的項目未交給 LLM，也不在結果中。</div>')
+
+
 def render_audit(a: Analysis) -> str:
+    review = render_review(a)
     w = a.web_audit
     if not w.get("enabled"):
-        return '<div class="muted">網路補充搜尋未開啟：本次分析沒有任何資料離開本機。</div>'
+        return review + '<div class="muted">網路補充搜尋未開啟：本次分析沒有任何資料離開本機。</div>'
     demo = ('<div class="note note-info">示範模式：以下查詢<b>沒有</b>真正送出，僅展示實際模式會送出的內容。</div>'
             if w.get("demo") else "")
     sent = "".join(f"<li><code>{esc(q)}</code></li>" for q in w["sent"]) or "<li class='muted'>（無）</li>"
     cached = "".join(f"<li><code>{esc(q)}</code></li>" for q in w["cached"])
-    return (demo + '<div>只會送出「標準化項目名稱＋偏高/偏低＋衛教」，不含數值、姓名或報告文字。</div>'
+    return (review + demo + '<div>只會送出「標準化項目名稱＋偏高/偏低＋衛教」，不含數值、姓名或報告文字。</div>'
             f'<div class="cat-h">本次送出的查詢</div><ul>{sent}</ul>'
             + (f'<div class="cat-h">使用本機快取（未送出）</div><ul>{cached}</ul>' if cached else "")
             + (f'<div class="muted small">另有 {w["blocked"]} 個項目因不在標準名稱表中而未送出。</div>'
@@ -735,6 +809,7 @@ def export_dict(a: Analysis) -> Dict:
         "references": [{"id": c["id"], "source": c.get("source"), "for_finding":
                         c.get("for_finding") or a.fact_for.get(c["id"]), "url": c.get("url")}
                        for c in r.chunks],
+        "review": getattr(r, "review", None) or {},
         "timing_s": r.timing, "used_ocr": r.used_ocr, "error": r.error,
         "disclaimer": DISCLAIMER,
     }
@@ -903,7 +978,7 @@ def build_app(res: Resources, runs_db: str = RUNS_DB):
     import gradio as gr
 
     sample_map = {label: str(SAMPLES_DIR / fn) for label, fn in SAMPLES if (SAMPLES_DIR / fn).exists()}
-    blocks_kw = {"title": "健檢報告標籤器", "delete_cache": (3600, 3600)}
+    blocks_kw = {"title": "健檢報告解讀器", "delete_cache": (3600, 3600)}
     launch_kw = {}
     if "theme" in inspect.signature(gr.Blocks.__init__).parameters and int(gr.__version__.split(".")[0]) < 6:
         blocks_kw.update(theme=_theme(gr), css=CSS)
@@ -926,9 +1001,10 @@ def build_app(res: Resources, runs_db: str = RUNS_DB):
                                    info="只儲存代號的加鹽雜湊，不會儲存代號本身、檔名或報告文字")
                 rdate = gr.Textbox(label="報告日期（選填）", placeholder="YYYY-MM-DD，留空則自動從報告讀取")
                 web = gr.Checkbox(value=False, label="允許網路補充搜尋（僅送出標準化項目名稱）")
+                review_cb = gr.Checkbox(value=False, label="護理師審核：規則判定後先暫停，確認後才產生建議")
                 run = gr.Button("開始分析", variant="primary")
                 status = gr.Markdown("")
-                with gr.Accordion("網路查詢稽核紀錄", open=False):
+                with gr.Accordion("稽核紀錄（審核、網路查詢）", open=False):
                     audit = gr.HTML('<div class="muted">尚未分析。</div>')
                 with gr.Accordion("系統狀態", open=False):
                     gr.HTML('<table class="kv">' + "".join(
@@ -936,6 +1012,12 @@ def build_app(res: Resources, runs_db: str = RUNS_DB):
                         + "</table>")
             with gr.Column(scale=3):
                 notices = gr.HTML("")
+                with gr.Group(visible=False) as review_box:
+                    gr.HTML('<div class="cat-h">⏸ 護理師審核</div><div class="muted">以下是規則依檢驗值判定的'
+                            '狀況與風險。取消勾選誤判的項目，再按「確認並產生建議」：被刪除的項目不會交給 LLM、'
+                            '不會出現在結果中，並記入稽核紀錄。</div>')
+                    review_items = gr.CheckboxGroup(choices=[], value=[], label="規則判定結果（勾選 = 保留）")
+                    review_go = gr.Button("確認並產生建議", variant="primary")
                 overview = gr.HTML("")
                 with gr.Tabs():
                     with gr.Tab("摘要 & 標籤"):
@@ -967,25 +1049,22 @@ def build_app(res: Resources, runs_db: str = RUNS_DB):
         sample.change(lambda s: sample_map.get(s), inputs=sample, outputs=pdf)
 
         outputs = [status, notices, overview, tags_html, findings_html, refs_html, perf_html, audit,
-                   dl_json, dl_csv, state, trend_item, trend_plot, trend_table]
+                   dl_json, dl_csv, state, trend_item, trend_plot, trend_table, review_box, review_items]
+        at = outputs.index
 
-        def analyze(pdf_path, sex_choice, alias_v, rdate_v, web_v, only_abn_v, progress=gr.Progress()):
+        def _progress(work, only_abn_v, progress):
+            """Run work(on_stage, on_partial) -> Analysis in a thread and stream: stage lines, the
+            early findings + rule view, then the final result or the paused-for-review panel."""
             skip = [gr.update()] * (len(outputs) - 1)
-            if not pdf_path:
-                yield ["⚠ 請先上傳 PDF 或選擇範例報告。", *skip]
-                return
-            if rdate_v and not re.fullmatch(r"\d{4}-\d{2}-\d{2}", rdate_v.strip()):
-                yield ["⚠ 報告日期格式應為 YYYY-MM-DD。", *skip]
-                return
-            data = Path(pdf_path).read_bytes()
+            first_upd = [gr.update()] * len(outputs)
+            first_upd[at(review_box)] = gr.update(visible=False)
+            yield first_upd
             q: "queue.Queue" = queue.Queue()
             box: Dict = {}
 
             def worker():
                 try:
-                    box["a"] = run_analysis(data, res, sex_choice, alias_v, rdate_v or "", bool(web_v),
-                                            on_stage=lambda s: q.put(("stage", s)), runs_db=runs_db,
-                                            on_partial=lambda pa: q.put(("partial", pa)))
+                    box["a"] = work(lambda s: q.put(("stage", s)), lambda pa: q.put(("partial", pa)))
                 except Exception as e:  # noqa: BLE001
                     log.exception("analysis failed")
                     box["err"] = e
@@ -1004,15 +1083,16 @@ def build_app(res: Resources, runs_db: str = RUNS_DB):
                 if kind == "partial":
                     # 1st partial: findings + rule tags (~1 s); later ones: streamed LLM advice
                     upd = [gr.update()] * len(outputs)
-                    upd[outputs.index(tags_html)] = render_tags(val)
+                    upd[at(tags_html)] = render_tags(val)
                     if not shown_findings:
                         shown_findings = True
-                        upd[outputs.index(notices)] = render_notices(val)
-                        upd[outputs.index(overview)] = render_overview(val)
-                        upd[outputs.index(findings_html)] = render_findings(val, bool(only_abn_v))
+                        upd[at(notices)] = render_notices(val)
+                        upd[at(overview)] = render_overview(val)
+                        upd[at(findings_html)] = render_findings(val, bool(only_abn_v))
                         first = val.result.timing.get("first_result_s")
-                        lines.append(f"⚡ 檢驗值與規則判定已顯示（{first:.1f} 秒）；建議標籤生成中…")
-                        upd[0] = "\n\n".join(lines)
+                        if first is not None:
+                            lines.append(f"⚡ 檢驗值與規則判定已顯示（{first:.1f} 秒）")
+                            upd[0] = "\n\n".join(lines)
                     yield upd
                     continue
                 done_stages.append(val)
@@ -1024,23 +1104,58 @@ def build_app(res: Resources, runs_db: str = RUNS_DB):
                 yield [f"❌ 分析失敗：{esc(box['err'])}", *skip]
                 return
             a: Analysis = box["a"]
+            upd = [gr.update()] * len(outputs)
+            upd[at(notices)], upd[at(overview)] = render_notices(a), render_overview(a)
+            upd[at(tags_html)], upd[at(findings_html)] = render_tags(a), render_findings(a, bool(only_abn_v))
+            upd[at(state)] = a
+            if a.paused:
+                choices, values = review_choices(a)
+                upd[0] = ("⏸ 等待護理師審核：檢驗值與規則判定已顯示。請在右側確認規則判定的狀況與風險，"
+                          "取消勾選誤判的項目後按「確認並產生建議」。")
+                upd[at(review_box)] = gr.update(visible=True)
+                upd[at(review_items)] = gr.update(choices=choices, value=values)
+                yield upd
+                return
             jp, cp = write_exports(a)
             choices = trend_choices(a.patient_id, runs_db) if a.patient_id else []
             first = choices[0][1] if choices else None
             plot_df, table_df = trend_outputs(a.patient_id, first, runs_db)
             tm = a.result.timing
-            msg = (f"✅ 完成，用時 {tm.get('total_s', 0):.1f} 秒"
-                   + (f"（首批結果 {tm['first_result_s']:.1f} 秒）" if tm.get("first_result_s") else "")
-                   + ("（快取結果）" if a.cached else "")
-                   if not a.result.error else f"⚠ {esc(a.result.error)}")
-            yield [msg, render_notices(a), render_overview(a), render_tags(a),
-                   render_findings(a, bool(only_abn_v)), render_references(a), render_perf(a, res),
-                   render_audit(a), gr.update(value=jp, interactive=True),
-                   gr.update(value=cp, interactive=True), a,
-                   gr.update(choices=choices, value=first), plot_df, table_df]
+            upd[0] = (f"✅ 完成，用時 {tm.get('total_s', 0):.1f} 秒"
+                      + (f"（首批結果 {tm['first_result_s']:.1f} 秒）" if tm.get("first_result_s") else "")
+                      + ("（快取結果）" if a.cached else "")
+                      if not a.result.error else f"⚠ {esc(a.result.error)}")
+            upd[at(refs_html)], upd[at(perf_html)], upd[at(audit)] = (
+                render_references(a), render_perf(a, res), render_audit(a))
+            upd[at(dl_json)] = gr.update(value=jp, interactive=True)
+            upd[at(dl_csv)] = gr.update(value=cp, interactive=True)
+            upd[at(trend_item)] = gr.update(choices=choices, value=first)
+            upd[at(trend_plot)], upd[at(trend_table)] = plot_df, table_df
+            yield upd
 
-        run.click(analyze, inputs=[pdf, sex, alias, rdate, web, only_abn], outputs=outputs,
+        def analyze(pdf_path, sex_choice, alias_v, rdate_v, web_v, review_v, only_abn_v, progress=gr.Progress()):
+            skip = [gr.update()] * (len(outputs) - 1)
+            if not pdf_path:
+                yield ["⚠ 請先上傳 PDF 或選擇範例報告。", *skip]
+                return
+            if rdate_v and not re.fullmatch(r"\d{4}-\d{2}-\d{2}", rdate_v.strip()):
+                yield ["⚠ 報告日期格式應為 YYYY-MM-DD。", *skip]
+                return
+            data = Path(pdf_path).read_bytes()
+            yield from _progress(lambda on_stage, on_partial: run_analysis(
+                data, res, sex_choice, alias_v, rdate_v or "", bool(web_v), on_stage=on_stage,
+                runs_db=runs_db, on_partial=on_partial, review=bool(review_v)), only_abn_v, progress)
+
+        def resume(a, keep, only_abn_v, progress=gr.Progress()):
+            if a is None or not getattr(a, "paused", False):
+                yield ["⚠ 目前沒有等待審核的分析。", *([gr.update()] * (len(outputs) - 1))]
+                return
+            yield from _progress(lambda on_stage, on_partial: resume_analysis(
+                a, keep or [], res, on_stage=on_stage, on_partial=on_partial), only_abn_v, progress)
+
+        run.click(analyze, inputs=[pdf, sex, alias, rdate, web, review_cb, only_abn], outputs=outputs,
                   concurrency_limit=1)
+        review_go.click(resume, inputs=[state, review_items, only_abn], outputs=outputs, concurrency_limit=1)
         only_abn.change(lambda a, o: render_findings(a, o) if a else "", inputs=[state, only_abn],
                         outputs=findings_html)
 

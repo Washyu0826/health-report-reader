@@ -534,7 +534,8 @@ def main():
     ap.add_argument("--no-verify", action="store_true", help="skip the claim-verification layer")
     ap.add_argument("--no-rules", action="store_true", help="skip rule-based conditions/risks")
     ap.add_argument("--graph", action="store_true",
-                    help="run through graph_workflow.run_graph (LangGraph; rewrites unsupported tags)")
+                    help="call graph_workflow.run_graph directly with the rewrite loop ON (the default "
+                         "path runs the same LangGraph workflow with rewrite off)")
     ap.add_argument("--no-rewrite", action="store_true",
                     help="with --graph: drop unsupported tags instead of rewriting (ablation control)")
     ap.add_argument("--only", default="", help="comma-separated sample-name prefixes")
