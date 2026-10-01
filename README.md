@@ -82,25 +82,15 @@ citations were verified and the unsupported one was dropped. For example, 減少
 「改善三酸甘油脂的生活調整」, written from a Health Promotion Administration page, and the verifier found the advice in
 that passage.
 
-## Screens
+## Architecture
 
-<table>
-<tr>
-<td width="50%" valign="top"><img src="docs/img/ui_tags.png" alt="Tags with sources; one advice tag opened to show its cited passage"><br><b>Tags and evidence.</b> Every tag shows its source (report, rule, knowledge base) and verdict; click one to see the passage it cites.</td>
-<td width="50%" valign="top"><img src="docs/img/ui_review.png" alt="Nurse review checklist with one condition unticked"><br><b>Nurse review.</b> The run pauses after the rules; untick a false flag and confirm before any advice is written.</td>
-</tr>
-<tr>
-<td valign="top"><img src="docs/img/ui_references.png" alt="Retrieved passages grouped by finding"><br><b>References.</b> The fact sheet and passages retrieved for each abnormal finding, and which were sent to the LLM.</td>
-<td valign="top"><img src="docs/img/ui_trend.png" alt="Triglycerides across two reports"><br><b>Trends.</b> Values across a person's reports, stored under a salted ID, never the name. Shown: a demo ID over two synthetic reports, triglycerides 83 → 248.</td>
-</tr>
-</table>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/architecture_dark.png">
+  <img src="docs/img/architecture.png" alt="Five-stage pipeline: read and normalise, rules and retrieval in parallel, an optional nurse review, then advice that is checked before it is shown">
+</picture>
 
-<details><summary>More: the structured findings table, performance panel</summary>
-
-![Three synthetic report layouts turned into one structured findings table](docs/img/hero.png)
-![Stage timings and citation-verification statistics](docs/img/ui_performance.png)
-
-</details>
+Rules and retrieval run in parallel on every report; review is a pause, not a branch — the graph resumes from the same
+state once a nurse confirms or edits the flags.
 
 ## Who uses it for what
 

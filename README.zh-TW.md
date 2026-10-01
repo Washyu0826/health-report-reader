@@ -75,25 +75,15 @@ LLM 只在第 5 步撰寫建議：只能引用它實際看到的段落，每條�
 沒有依據的 1 條被刪除。例如「減少含糖飲料」引用段落 `kb_3_0`「改善三酸甘油脂的生活調整」（依國民健康署網頁撰寫），
 查核時確實在該段落找到這項建議。
 
-## 畫面導覽
+## 系統架構
 
-<table>
-<tr>
-<td width="50%" valign="top"><img src="docs/img/ui_tags.png" alt="各類標籤與來源；點開一個建議標籤顯示它引用的段落"><br><b>標籤與依據。</b>每個標籤都標示來源（報告、規則、知識庫）與查核結果，點開就能看到引用的段落。</td>
-<td width="50%" valign="top"><img src="docs/img/ui_review.png" alt="護理師審核清單，其中一項判定被取消勾選"><br><b>護理師審核。</b>規則判定完先暫停，取消勾選誤判的項目並確認後，才開始產生建議。</td>
-</tr>
-<tr>
-<td valign="top"><img src="docs/img/ui_references.png" alt="依異常項目分組的參考資料"><br><b>參考資料。</b>每個異常項目檢索到的項目說明卡與知識庫段落，以及哪些有交給 LLM。</td>
-<td valign="top"><img src="docs/img/ui_trend.png" alt="兩份報告的三酸甘油脂變化"><br><b>趨勢。</b>同一個人歷次報告的數值變化，以加鹽雜湊的代號儲存，不存姓名。圖中是示範代號下的兩份合成報告：三酸甘油脂 83 → 248。</td>
-</tr>
-</table>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/architecture_zh_dark.png">
+  <img src="docs/img/architecture_zh.png" alt="五段式流程：讀取與核對、規則判定與檢索平行執行、可選的護理師審核、最後是經過查核才顯示的建議">
+</picture>
 
-<details><summary>更多：結構化檢驗值表、效能面板</summary>
-
-![三種排版的合成報告轉成同一種結構化檢驗值表](docs/img/hero.png)
-![各階段耗時與引用查核統計](docs/img/ui_performance.png)
-
-</details>
+規則判定與檢索在每份報告上都平行執行；審核是流程的暫停點，不是另一條分支——護理師確認或修改判定後，流程會從原本的
+狀態繼續，不會重跑。
 
 ## 誰用、用來做什麼
 
