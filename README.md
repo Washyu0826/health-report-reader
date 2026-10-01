@@ -5,7 +5,7 @@
 > **Reads any Taiwanese health-check report PDF (any layout, text or scanned) and turns it into structured, checked
 > lab findings and evidence-backed health tags, fully on a local GPU.**
 >
-> Student project — my AI internship, through NCCU's AI internship program (see Background below). The public
+> Internship project — my AI internship, through NCCU's AI internship program (see Background below). The public
 > version has the employer's data removed.
 >
 > License: [MIT](LICENSE) · Measurement log: [eval/HISTORY.md](eval/HISTORY.md)
