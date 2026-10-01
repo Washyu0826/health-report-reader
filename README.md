@@ -45,6 +45,7 @@ under 423 different names.) It is not an official H2U product.
 | LLMs make up numbers and diagnoses | values, abnormal flags and lab-derived conditions come from rules — never from the LLM |
 | Advice drifts into generic filler | retrieval is driven by *this* report's findings; the schema only lets the model cite passages it was shown; unsupported advice is dropped |
 | A wrong screening flag shouldn't become advice | an optional nurse review pauses the graph before any advice is written |
+| Other systems need standard data, not another CSV layout | a FHIR R4 Bundle with one LOINC-coded `Observation` per value; 122 of 143 items mapped, the rest left uncoded on purpose |
 | Health data is sensitive | every model runs locally; web search and LangSmith tracing are off by default (tested) |
 
 ## Architecture
@@ -54,27 +55,13 @@ under 423 different names.) It is not an official H2U product.
   <img src="docs/img/architecture.png" alt="Five-stage pipeline: read and normalise, rules and retrieval in parallel, an optional nurse review, then advice that is checked before it is shown">
 </picture>
 
-* Rules and retrieval run in parallel on every report.
-* Numbers and screening flags come only from rules — they never reach the LLM.
-* Review is a pause, not a branch: the graph resumes from the same state once a nurse confirms or edits the flags.
+The whole flow is a **LangGraph** `StateGraph` ([docs/graph.md](docs/graph.md)): rules and retrieval run in parallel,
+review is a pause rather than a branch — a LangGraph `interrupt` that resumes from the same state once a nurse
+confirms or edits the flags — and progress and the LLM's output stream live to the UI. Every model runs locally via
+Ollama: qwen2.5:7b (advice), qwen3-embedding:0.6b (retrieval), GLM-OCR (scans).
 
 **Verified:** LangGraph produces identical output to the hand-wired pipeline on 72 reports (deterministic fake LLM);
 with the real LLM every quality metric is unchanged, and orchestration adds 0.02 s per report.
-
-## How it works
-
-The flow runs as a **LangGraph** `StateGraph` ([docs/graph.md](docs/graph.md)): rules and retrieval run in parallel,
-the review step is a LangGraph `interrupt` (state kept in memory only), and progress and the LLM's output stream to
-the UI. Models, all local via Ollama: qwen2.5:7b (advice), qwen3-embedding:0.6b (retrieval), GLM-OCR (scans).
-
-| Problem | Design decision |
-|---|---|
-| Every clinic names and ranges tests differently | canonical synonym table (143 items) + NFKC normalisation; each value is judged against the printed range **and** a public range, and disagreements are flagged ⚠ |
-| LLMs make up numbers and diagnoses | values, abnormal flags and lab-derived conditions come from rules (e.g. metabolic syndrome = 3 of 5 criteria), never from the LLM |
-| Advice drifts into generic filler | retrieval is driven by *this* report's findings; the JSON schema only lets the model cite passages it was shown; unsupported advice is dropped |
-| Other systems need standard data, not another CSV layout | FHIR R4 Bundle: one LOINC-coded `Observation` per value with both reference ranges and an H/L interpretation; 122 of 143 items mapped, the rest left uncoded on purpose |
-| A wrong screening flag should not turn into advice | optional nurse review: remove a flagged condition before the LLM runs, recorded in the audit |
-| Health data is sensitive | all models run locally (Ollama); web search is off by default; LangSmith tracing is forced off even if the environment enables it (tested) |
 
 ## Quick start
 
