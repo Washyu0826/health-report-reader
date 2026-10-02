@@ -1,0 +1,1986 @@
+{
+ "seed": 20260930,
+ "levels": {
+  "clean": {
+   "dpi": 200,
+   "angle": [
+    0.0,
+    0.0
+   ],
+   "noise": 0,
+   "blur": 0.0,
+   "jpeg": 92,
+   "speck": 0.0
+  },
+  "medium": {
+   "dpi": 150,
+   "angle": [
+    0.6,
+    1.6
+   ],
+   "noise": 9,
+   "blur": 0.6,
+   "jpeg": 72,
+   "speck": 0.0015
+  },
+  "heavy": {
+   "dpi": 150,
+   "angle": [
+    1.8,
+    2.6
+   ],
+   "noise": 14,
+   "blur": 1.0,
+   "jpeg": 55,
+   "speck": 0.003
+  }
+ },
+ "files": [
+  "syn_001.pdf",
+  "syn_003.pdf",
+  "syn_006.pdf",
+  "syn_009.pdf",
+  "syn_012.pdf",
+  "syn_015.pdf",
+  "syn_018.pdf",
+  "syn_020.pdf",
+  "syn_024.pdf",
+  "syn_027.pdf",
+  "syn_030.pdf",
+  "syn_033.pdf",
+  "syn_036.pdf",
+  "syn_041.pdf",
+  "syn_043.pdf",
+  "syn_046.pdf",
+  "syn_049.pdf",
+  "syn_052.pdf",
+  "syn_055.pdf",
+  "syn_058.pdf"
+ ],
+ "summary": {
+  "clean": {
+   "reports": 20,
+   "failed": 0,
+   "abnormal_precision": 0.953,
+   "abnormal_recall": 0.891,
+   "abnormal_f1": 0.921,
+   "value_accuracy": 0.892,
+   "misread_values": 2,
+   "missing_items": 75,
+   "sec_per_page_p50": 11.8,
+   "most_misread_items": [
+    [
+     "glucose_ac",
+     1
+    ],
+    [
+     "height",
+     1
+    ]
+   ],
+   "misread_examples": [
+    [
+     "glucose_ac",
+     "84",
+     "8.4"
+    ],
+    [
+     "height",
+     "152.1",
+     "1"
+    ]
+   ]
+  },
+  "medium": {
+   "reports": 20,
+   "failed": 0,
+   "abnormal_precision": 0.988,
+   "abnormal_recall": 0.88,
+   "abnormal_f1": 0.931,
+   "value_accuracy": 0.907,
+   "misread_values": 1,
+   "missing_items": 65,
+   "sec_per_page_p50": 11.7,
+   "most_misread_items": [
+    [
+     "glucose_ac",
+     1
+    ]
+   ],
+   "misread_examples": [
+    [
+     "glucose_ac",
+     "84",
+     "8.4"
+    ]
+   ]
+  },
+  "heavy": {
+   "reports": 20,
+   "failed": 0,
+   "abnormal_precision": 1.0,
+   "abnormal_recall": 0.826,
+   "abnormal_f1": 0.905,
+   "value_accuracy": 0.81,
+   "misread_values": 2,
+   "missing_items": 133,
+   "sec_per_page_p50": 11.1,
+   "most_misread_items": [
+    [
+     "egfr",
+     1
+    ],
+    [
+     "glucose_ac",
+     1
+    ]
+   ],
+   "misread_examples": [
+    [
+     "egfr",
+     "98.3",
+     ">60"
+    ],
+    [
+     "glucose_ac",
+     "84",
+     "8.4"
+    ]
+   ]
+  },
+  "text_layer_control": {
+   "reports": 20,
+   "abnormal_f1": 1.0
+  }
+ },
+ "rows": [
+  {
+   "file": "syn_001.pdf",
+   "layout": "twocol",
+   "level": "clean",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 20.25,
+   "sec_per_page": 10.13,
+   "items_text": 37,
+   "items_scan": 21,
+   "values_exact": 21,
+   "misread": [],
+   "missing": [
+    "sbp",
+    "dbp",
+    "pulse",
+    "mch",
+    "mchc",
+    "plt",
+    "albumin",
+    "total_protein",
+    "egfr",
+    "uric_acid",
+    "hdl",
+    "ldl",
+    "ca199",
+    "urine_glucose",
+    "urine_ob",
+    "urine_ketone"
+   ],
+   "control_abnormal": {
+    "tp": 0,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 0,
+    "fp": 2,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_001.pdf",
+   "layout": "twocol",
+   "level": "medium",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 21.43,
+   "sec_per_page": 10.72,
+   "items_text": 37,
+   "items_scan": 33,
+   "values_exact": 33,
+   "misread": [],
+   "missing": [
+    "waist",
+    "urine_glucose",
+    "urine_ob",
+    "urine_ketone"
+   ],
+   "control_abnormal": {
+    "tp": 0,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 0,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_001.pdf",
+   "layout": "twocol",
+   "level": "heavy",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 21.82,
+   "sec_per_page": 10.91,
+   "items_text": 37,
+   "items_scan": 30,
+   "values_exact": 30,
+   "misread": [],
+   "missing": [
+    "waist",
+    "sbp",
+    "hdl",
+    "ca199",
+    "urine_glucose",
+    "urine_ob",
+    "urine_ketone"
+   ],
+   "control_abnormal": {
+    "tp": 0,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 0,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_003.pdf",
+   "layout": "twocol",
+   "level": "clean",
+   "pages": 1,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 45.28,
+   "sec_per_page": 45.28,
+   "items_text": 30,
+   "items_scan": 30,
+   "values_exact": 30,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 3,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 3,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_003.pdf",
+   "layout": "twocol",
+   "level": "medium",
+   "pages": 1,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 16.76,
+   "sec_per_page": 16.76,
+   "items_text": 30,
+   "items_scan": 29,
+   "values_exact": 29,
+   "misread": [],
+   "missing": [
+    "waist"
+   ],
+   "control_abnormal": {
+    "tp": 3,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 3,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_003.pdf",
+   "layout": "twocol",
+   "level": "heavy",
+   "pages": 1,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 12.2,
+   "sec_per_page": 12.2,
+   "items_text": 30,
+   "items_scan": 0,
+   "values_exact": 0,
+   "misread": [],
+   "missing": [
+    "height",
+    "weight",
+    "bmi",
+    "waist",
+    "sbp",
+    "dbp",
+    "wbc",
+    "rbc",
+    "hb",
+    "mchc",
+    "plt",
+    "ast",
+    "alt",
+    "bil_total",
+    "total_protein",
+    "bun",
+    "creatinine",
+    "egfr",
+    "uric_acid",
+    "chol",
+    "tg",
+    "hdl",
+    "ldl",
+    "glucose_ac",
+    "psa",
+    "urine_ph",
+    "urine_sg",
+    "urine_protein",
+    "urine_glucose",
+    "urine_ob"
+   ],
+   "control_abnormal": {
+    "tp": 3,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 0,
+    "fp": 0,
+    "fn": 3
+   }
+  },
+  {
+   "file": "syn_006.pdf",
+   "layout": "plain",
+   "level": "clean",
+   "pages": 1,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 9.76,
+   "sec_per_page": 9.76,
+   "items_text": 35,
+   "items_scan": 35,
+   "values_exact": 35,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_006.pdf",
+   "layout": "plain",
+   "level": "medium",
+   "pages": 1,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 11.53,
+   "sec_per_page": 11.53,
+   "items_text": 35,
+   "items_scan": 34,
+   "values_exact": 34,
+   "misread": [],
+   "missing": [
+    "waist"
+   ],
+   "control_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_006.pdf",
+   "layout": "plain",
+   "level": "heavy",
+   "pages": 1,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 12.16,
+   "sec_per_page": 12.16,
+   "items_text": 35,
+   "items_scan": 34,
+   "values_exact": 34,
+   "misread": [],
+   "missing": [
+    "waist"
+   ],
+   "control_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_009.pdf",
+   "layout": "fullwidth",
+   "level": "clean",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 21.56,
+   "sec_per_page": 10.78,
+   "items_text": 30,
+   "items_scan": 30,
+   "values_exact": 30,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 4,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 4,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_009.pdf",
+   "layout": "fullwidth",
+   "level": "medium",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 17.11,
+   "sec_per_page": 8.56,
+   "items_text": 30,
+   "items_scan": 6,
+   "values_exact": 6,
+   "misread": [],
+   "missing": [
+    "height",
+    "weight",
+    "bmi",
+    "waist",
+    "sbp",
+    "dbp",
+    "wbc",
+    "rbc",
+    "hb",
+    "hct",
+    "mcv",
+    "mch",
+    "mchc",
+    "plt",
+    "ast",
+    "alt",
+    "creatinine",
+    "egfr",
+    "uric_acid",
+    "chol",
+    "tg",
+    "hdl",
+    "ldl",
+    "glucose_ac"
+   ],
+   "control_abnormal": {
+    "tp": 4,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 0,
+    "fp": 0,
+    "fn": 4
+   }
+  },
+  {
+   "file": "syn_009.pdf",
+   "layout": "fullwidth",
+   "level": "heavy",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 17.04,
+   "sec_per_page": 8.52,
+   "items_text": 30,
+   "items_scan": 6,
+   "values_exact": 6,
+   "misread": [],
+   "missing": [
+    "height",
+    "weight",
+    "bmi",
+    "waist",
+    "sbp",
+    "dbp",
+    "wbc",
+    "rbc",
+    "hb",
+    "hct",
+    "mcv",
+    "mch",
+    "mchc",
+    "plt",
+    "ast",
+    "alt",
+    "creatinine",
+    "egfr",
+    "uric_acid",
+    "chol",
+    "tg",
+    "hdl",
+    "ldl",
+    "glucose_ac"
+   ],
+   "control_abnormal": {
+    "tp": 4,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 0,
+    "fp": 0,
+    "fn": 4
+   }
+  },
+  {
+   "file": "syn_012.pdf",
+   "layout": "fullwidth",
+   "level": "clean",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 23.99,
+   "sec_per_page": 12.0,
+   "items_text": 37,
+   "items_scan": 37,
+   "values_exact": 37,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 4,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 4,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_012.pdf",
+   "layout": "fullwidth",
+   "level": "medium",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 24.55,
+   "sec_per_page": 12.28,
+   "items_text": 37,
+   "items_scan": 37,
+   "values_exact": 37,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 4,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 4,
+    "fp": 1,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_012.pdf",
+   "layout": "fullwidth",
+   "level": "heavy",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 19.85,
+   "sec_per_page": 9.93,
+   "items_text": 37,
+   "items_scan": 37,
+   "values_exact": 37,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 4,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 4,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_015.pdf",
+   "layout": "standard",
+   "level": "clean",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 22.53,
+   "sec_per_page": 11.26,
+   "items_text": 34,
+   "items_scan": 34,
+   "values_exact": 34,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 1,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 1,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_015.pdf",
+   "layout": "standard",
+   "level": "medium",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 25.55,
+   "sec_per_page": 12.78,
+   "items_text": 34,
+   "items_scan": 34,
+   "values_exact": 34,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 1,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 1,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_015.pdf",
+   "layout": "standard",
+   "level": "heavy",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 23.27,
+   "sec_per_page": 11.64,
+   "items_text": 34,
+   "items_scan": 33,
+   "values_exact": 33,
+   "misread": [],
+   "missing": [
+    "waist"
+   ],
+   "control_abnormal": {
+    "tp": 1,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 1,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_018.pdf",
+   "layout": "standard",
+   "level": "clean",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 24.08,
+   "sec_per_page": 12.04,
+   "items_text": 36,
+   "items_scan": 36,
+   "values_exact": 36,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 5,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 5,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_018.pdf",
+   "layout": "standard",
+   "level": "medium",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 25.51,
+   "sec_per_page": 12.75,
+   "items_text": 36,
+   "items_scan": 36,
+   "values_exact": 36,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 5,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 5,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_018.pdf",
+   "layout": "standard",
+   "level": "heavy",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 22.87,
+   "sec_per_page": 11.43,
+   "items_text": 36,
+   "items_scan": 35,
+   "values_exact": 35,
+   "misread": [],
+   "missing": [
+    "waist"
+   ],
+   "control_abnormal": {
+    "tp": 5,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 5,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_020.pdf",
+   "layout": "fullwidth",
+   "level": "clean",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 23.16,
+   "sec_per_page": 11.58,
+   "items_text": 34,
+   "items_scan": 34,
+   "values_exact": 33,
+   "misread": [
+    [
+     "glucose_ac",
+     "84",
+     "8.4"
+    ]
+   ],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 7,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 7,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_020.pdf",
+   "layout": "fullwidth",
+   "level": "medium",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 23.87,
+   "sec_per_page": 11.93,
+   "items_text": 34,
+   "items_scan": 34,
+   "values_exact": 33,
+   "misread": [
+    [
+     "glucose_ac",
+     "84",
+     "8.4"
+    ]
+   ],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 7,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 7,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_020.pdf",
+   "layout": "fullwidth",
+   "level": "heavy",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 22.13,
+   "sec_per_page": 11.06,
+   "items_text": 34,
+   "items_scan": 33,
+   "values_exact": 31,
+   "misread": [
+    [
+     "egfr",
+     "98.3",
+     ">60"
+    ],
+    [
+     "glucose_ac",
+     "84",
+     "8.4"
+    ]
+   ],
+   "missing": [
+    "urine_ob"
+   ],
+   "control_abnormal": {
+    "tp": 7,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 7,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_024.pdf",
+   "layout": "twocol",
+   "level": "clean",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 51.15,
+   "sec_per_page": 25.57,
+   "items_text": 33,
+   "items_scan": 33,
+   "values_exact": 33,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_024.pdf",
+   "layout": "twocol",
+   "level": "medium",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 20.51,
+   "sec_per_page": 10.25,
+   "items_text": 33,
+   "items_scan": 33,
+   "values_exact": 33,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_024.pdf",
+   "layout": "twocol",
+   "level": "heavy",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 21.61,
+   "sec_per_page": 10.81,
+   "items_text": 33,
+   "items_scan": 31,
+   "values_exact": 31,
+   "misread": [],
+   "missing": [
+    "dbp",
+    "chol"
+   ],
+   "control_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 5,
+    "fp": 0,
+    "fn": 1
+   }
+  },
+  {
+   "file": "syn_027.pdf",
+   "layout": "standard",
+   "level": "clean",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 24.64,
+   "sec_per_page": 12.32,
+   "items_text": 38,
+   "items_scan": 38,
+   "values_exact": 38,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_027.pdf",
+   "layout": "standard",
+   "level": "medium",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 25.09,
+   "sec_per_page": 12.54,
+   "items_text": 38,
+   "items_scan": 38,
+   "values_exact": 38,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_027.pdf",
+   "layout": "standard",
+   "level": "heavy",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 21.7,
+   "sec_per_page": 10.85,
+   "items_text": 38,
+   "items_scan": 37,
+   "values_exact": 37,
+   "misread": [],
+   "missing": [
+    "chol"
+   ],
+   "control_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_030.pdf",
+   "layout": "standard",
+   "level": "clean",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 24.98,
+   "sec_per_page": 12.49,
+   "items_text": 38,
+   "items_scan": 38,
+   "values_exact": 38,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_030.pdf",
+   "layout": "standard",
+   "level": "medium",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 25.38,
+   "sec_per_page": 12.69,
+   "items_text": 38,
+   "items_scan": 38,
+   "values_exact": 38,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_030.pdf",
+   "layout": "standard",
+   "level": "heavy",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 17.51,
+   "sec_per_page": 8.76,
+   "items_text": 38,
+   "items_scan": 12,
+   "values_exact": 12,
+   "misread": [],
+   "missing": [
+    "height",
+    "weight",
+    "bmi",
+    "waist",
+    "sbp",
+    "dbp",
+    "wbc",
+    "rbc",
+    "hb",
+    "hct",
+    "mcv",
+    "mch",
+    "mchc",
+    "plt",
+    "ast",
+    "alt",
+    "ggt",
+    "bil_total",
+    "total_protein",
+    "creatinine",
+    "egfr",
+    "uric_acid",
+    "chol",
+    "tg",
+    "hdl",
+    "ldl"
+   ],
+   "control_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 0,
+    "fp": 0,
+    "fn": 6
+   }
+  },
+  {
+   "file": "syn_033.pdf",
+   "layout": "inline_flags",
+   "level": "clean",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 20.99,
+   "sec_per_page": 10.49,
+   "items_text": 35,
+   "items_scan": 35,
+   "values_exact": 35,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 0,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 0,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_033.pdf",
+   "layout": "inline_flags",
+   "level": "medium",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 21.02,
+   "sec_per_page": 10.51,
+   "items_text": 35,
+   "items_scan": 35,
+   "values_exact": 35,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 0,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 0,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_033.pdf",
+   "layout": "inline_flags",
+   "level": "heavy",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 53.33,
+   "sec_per_page": 26.66,
+   "items_text": 35,
+   "items_scan": 34,
+   "values_exact": 34,
+   "misread": [],
+   "missing": [
+    "chol"
+   ],
+   "control_abnormal": {
+    "tp": 0,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 0,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_036.pdf",
+   "layout": "twocol",
+   "level": "clean",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 20.04,
+   "sec_per_page": 10.02,
+   "items_text": 39,
+   "items_scan": 24,
+   "values_exact": 24,
+   "misread": [],
+   "missing": [
+    "waist",
+    "sbp",
+    "dbp",
+    "mcv",
+    "mch",
+    "mchc",
+    "plt",
+    "bil_total",
+    "albumin",
+    "total_protein",
+    "egfr",
+    "uric_acid",
+    "hdl",
+    "ldl",
+    "ca199"
+   ],
+   "control_abnormal": {
+    "tp": 8,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 6,
+    "fp": 1,
+    "fn": 2
+   }
+  },
+  {
+   "file": "syn_036.pdf",
+   "layout": "twocol",
+   "level": "medium",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 22.0,
+   "sec_per_page": 11.0,
+   "items_text": 39,
+   "items_scan": 37,
+   "values_exact": 37,
+   "misread": [],
+   "missing": [
+    "waist",
+    "urine_ob"
+   ],
+   "control_abnormal": {
+    "tp": 8,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 8,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_036.pdf",
+   "layout": "twocol",
+   "level": "heavy",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 23.15,
+   "sec_per_page": 11.58,
+   "items_text": 39,
+   "items_scan": 35,
+   "values_exact": 35,
+   "misread": [],
+   "missing": [
+    "waist",
+    "ggt",
+    "chol",
+    "urine_ob"
+   ],
+   "control_abnormal": {
+    "tp": 8,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 8,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_041.pdf",
+   "layout": "inline_flags",
+   "level": "clean",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 52.8,
+   "sec_per_page": 26.4,
+   "items_text": 36,
+   "items_scan": 36,
+   "values_exact": 36,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 5,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 5,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_041.pdf",
+   "layout": "inline_flags",
+   "level": "medium",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 53.11,
+   "sec_per_page": 26.56,
+   "items_text": 36,
+   "items_scan": 36,
+   "values_exact": 36,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 5,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 5,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_041.pdf",
+   "layout": "inline_flags",
+   "level": "heavy",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 54.42,
+   "sec_per_page": 27.21,
+   "items_text": 36,
+   "items_scan": 36,
+   "values_exact": 36,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 5,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 5,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_043.pdf",
+   "layout": "standard",
+   "level": "clean",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 22.12,
+   "sec_per_page": 11.06,
+   "items_text": 33,
+   "items_scan": 33,
+   "values_exact": 33,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 5,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 5,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_043.pdf",
+   "layout": "standard",
+   "level": "medium",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 22.29,
+   "sec_per_page": 11.15,
+   "items_text": 33,
+   "items_scan": 33,
+   "values_exact": 33,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 5,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 5,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_043.pdf",
+   "layout": "standard",
+   "level": "heavy",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 22.7,
+   "sec_per_page": 11.35,
+   "items_text": 33,
+   "items_scan": 31,
+   "values_exact": 31,
+   "misread": [],
+   "missing": [
+    "waist",
+    "chol"
+   ],
+   "control_abnormal": {
+    "tp": 5,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 5,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_046.pdf",
+   "layout": "twocol",
+   "level": "clean",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 18.64,
+   "sec_per_page": 9.32,
+   "items_text": 37,
+   "items_scan": 19,
+   "values_exact": 19,
+   "misread": [],
+   "missing": [
+    "waist",
+    "sbp",
+    "dbp",
+    "pulse",
+    "mcv",
+    "mch",
+    "mchc",
+    "plt",
+    "albumin",
+    "total_protein",
+    "egfr",
+    "uric_acid",
+    "hdl",
+    "ldl",
+    "hba1c",
+    "urine_glucose",
+    "urine_ob",
+    "urine_ketone"
+   ],
+   "control_abnormal": {
+    "tp": 8,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 6,
+    "fp": 1,
+    "fn": 2
+   }
+  },
+  {
+   "file": "syn_046.pdf",
+   "layout": "twocol",
+   "level": "medium",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 14.9,
+   "sec_per_page": 7.45,
+   "items_text": 37,
+   "items_scan": 4,
+   "values_exact": 4,
+   "misread": [],
+   "missing": [
+    "height",
+    "weight",
+    "bmi",
+    "waist",
+    "sbp",
+    "dbp",
+    "pulse",
+    "wbc",
+    "rbc",
+    "hb",
+    "hct",
+    "mcv",
+    "mch",
+    "mchc",
+    "plt",
+    "ast",
+    "alt",
+    "alp",
+    "albumin",
+    "total_protein",
+    "bun",
+    "creatinine",
+    "egfr",
+    "uric_acid",
+    "chol",
+    "tg",
+    "hdl",
+    "ldl",
+    "glucose_ac",
+    "hba1c",
+    "urine_glucose",
+    "urine_ob",
+    "urine_ketone"
+   ],
+   "control_abnormal": {
+    "tp": 8,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 1,
+    "fp": 0,
+    "fn": 7
+   }
+  },
+  {
+   "file": "syn_046.pdf",
+   "layout": "twocol",
+   "level": "heavy",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 19.37,
+   "sec_per_page": 9.69,
+   "items_text": 37,
+   "items_scan": 32,
+   "values_exact": 32,
+   "misread": [],
+   "missing": [
+    "waist",
+    "sbp",
+    "urine_glucose",
+    "urine_ob",
+    "urine_ketone"
+   ],
+   "control_abnormal": {
+    "tp": 8,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 8,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_049.pdf",
+   "layout": "fullwidth",
+   "level": "clean",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 25.57,
+   "sec_per_page": 12.79,
+   "items_text": 38,
+   "items_scan": 38,
+   "values_exact": 37,
+   "misread": [
+    [
+     "height",
+     "152.1",
+     "1"
+    ]
+   ],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 5,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 5,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_049.pdf",
+   "layout": "fullwidth",
+   "level": "medium",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 24.26,
+   "sec_per_page": 12.13,
+   "items_text": 38,
+   "items_scan": 38,
+   "values_exact": 38,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 5,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 5,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_049.pdf",
+   "layout": "fullwidth",
+   "level": "heavy",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 21.55,
+   "sec_per_page": 10.77,
+   "items_text": 38,
+   "items_scan": 38,
+   "values_exact": 38,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 5,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 5,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_052.pdf",
+   "layout": "standard",
+   "level": "clean",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 24.66,
+   "sec_per_page": 12.33,
+   "items_text": 36,
+   "items_scan": 36,
+   "values_exact": 36,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 3,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 3,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_052.pdf",
+   "layout": "standard",
+   "level": "medium",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 24.63,
+   "sec_per_page": 12.31,
+   "items_text": 36,
+   "items_scan": 36,
+   "values_exact": 36,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 3,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 3,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_052.pdf",
+   "layout": "standard",
+   "level": "heavy",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 53.2,
+   "sec_per_page": 26.6,
+   "items_text": 36,
+   "items_scan": 36,
+   "values_exact": 36,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 3,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 3,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_055.pdf",
+   "layout": "inline_flags",
+   "level": "clean",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 16.6,
+   "sec_per_page": 8.3,
+   "items_text": 35,
+   "items_scan": 9,
+   "values_exact": 9,
+   "misread": [],
+   "missing": [
+    "height",
+    "weight",
+    "bmi",
+    "waist",
+    "sbp",
+    "dbp",
+    "wbc",
+    "rbc",
+    "hb",
+    "hct",
+    "mcv",
+    "mch",
+    "mchc",
+    "plt",
+    "ast",
+    "alt",
+    "alp",
+    "bil_total",
+    "bun",
+    "creatinine",
+    "egfr",
+    "uric_acid",
+    "chol",
+    "tg",
+    "hdl",
+    "ldl"
+   ],
+   "control_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 0,
+    "fp": 0,
+    "fn": 6
+   }
+  },
+  {
+   "file": "syn_055.pdf",
+   "layout": "inline_flags",
+   "level": "medium",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 19.05,
+   "sec_per_page": 9.52,
+   "items_text": 35,
+   "items_scan": 35,
+   "values_exact": 35,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_055.pdf",
+   "layout": "inline_flags",
+   "level": "heavy",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 22.24,
+   "sec_per_page": 11.12,
+   "items_text": 35,
+   "items_scan": 33,
+   "values_exact": 33,
+   "misread": [],
+   "missing": [
+    "waist",
+    "urine_ob"
+   ],
+   "control_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 6,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_058.pdf",
+   "layout": "standard",
+   "level": "clean",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 24.54,
+   "sec_per_page": 12.27,
+   "items_text": 39,
+   "items_scan": 39,
+   "values_exact": 39,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 4,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 4,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_058.pdf",
+   "layout": "standard",
+   "level": "medium",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 21.87,
+   "sec_per_page": 10.93,
+   "items_text": 39,
+   "items_scan": 39,
+   "values_exact": 39,
+   "misread": [],
+   "missing": [],
+   "control_abnormal": {
+    "tp": 4,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 4,
+    "fp": 0,
+    "fn": 0
+   }
+  },
+  {
+   "file": "syn_058.pdf",
+   "layout": "standard",
+   "level": "heavy",
+   "pages": 2,
+   "used_ocr": true,
+   "error": "",
+   "seconds": 20.13,
+   "sec_per_page": 10.06,
+   "items_text": 39,
+   "items_scan": 14,
+   "values_exact": 14,
+   "misread": [],
+   "missing": [
+    "height",
+    "weight",
+    "bmi",
+    "waist",
+    "sbp",
+    "dbp",
+    "pulse",
+    "wbc",
+    "rbc",
+    "hb",
+    "hct",
+    "mcv",
+    "mch",
+    "plt",
+    "ast",
+    "alt",
+    "ggt",
+    "alp",
+    "bil_total",
+    "albumin",
+    "bun",
+    "creatinine",
+    "egfr",
+    "uric_acid",
+    "chol"
+   ],
+   "control_abnormal": {
+    "tp": 4,
+    "fp": 0,
+    "fn": 0
+   },
+   "scan_abnormal": {
+    "tp": 2,
+    "fp": 0,
+    "fn": 2
+   }
+  }
+ ]
+}

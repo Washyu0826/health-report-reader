@@ -19,7 +19,7 @@ local LLM writes advice that may only cite passages it was actually shown.
 | | |
 |---|---|
 | **Lab findings** | abnormal-item F1 **0.991** with **0 false positives** on 60 synthetic reports in 6 layouts (3 of them scanned) |
-| **Scanned PDFs** | 60 test scans at three quality levels: abnormal-item F1 **0.91–0.93**, precision **≥ 0.95** (local OCR) |
+| **Scanned PDFs** | 60 test scans at three quality levels: abnormal-item F1 **0.95–0.99**, precision **≥ 0.95** (local OCR) |
 | **Conditions** | screening-rule condition F1 **0.95**, each with the values that triggered it |
 | **Advice** | cites only passages the model was shown; 85% of citations verified, the rest dropped |
 | **Speed / privacy** | about **10 s** per report (first results in under 1 s); nothing leaves the machine (tested) |
@@ -202,6 +202,7 @@ de-identified reports (not published).
 | R9 | leaner prompt; knowledge-base ablation | latency p50 17 s → **9 s** at equal quality; 57 targeted passages beat a generic corpus, but 152 passages did *worse*, so 57 stay |
 | R10 | LangGraph as the only orchestration path; nurse review; batch CLI | identical outputs to the hand-wired pipeline on 72 reports (deterministic fake LLM); with the real LLM every quality metric is unchanged and LangGraph adds 0.02 s per report |
 | R11 | OCR evaluation (60 scans, 3 quality levels) and fixes; FHIR export | scan abnormal F1 0.60–0.85 → **0.91–0.93**, false positives 55 → 5; FHIR R4 with LOINC codes for 122 of 143 items |
+| R12 | two-column scan row recovery: detect the merged layout, re-OCR as two half-width crops | scan abnormal F1 0.91–0.93 → **0.95–0.99**; found and fixed a header-merge false-positive regression along the way (12/12/7 → back to near 0) |
 
 Release run (60 synthetic reports, R10): abnormal F1 0.991 (0 FP; all 5 misses are in one scanned PDF), condition F1
 0.95, risk F1 0.88, 85% of citations supported, advice directly relevant 49%, p50 9.6–10.5 s on an RTX 4060 Laptop GPU.
@@ -242,16 +243,17 @@ tests/                 unit, privacy (egress, tracing), LangGraph and UI tests
 * All models run locally. Web search is off by default; when enabled only a canonical item name ("收縮壓 偏高 衛教")
   can leave the machine. The report cache and exports never store the report text.
 * Rule conditions are **screening flags from a single report**, not diagnoses (e.g. one fasting-glucose value).
-* Scans are weaker than text-layer PDFs: on 60 test scans the OCR drops rows in two-column and heavily degraded
-  pages (72–81% of values read), while what it does return is reliable (precision ≥ 0.95). See R11 in
-  [eval/HISTORY.md](eval/HISTORY.md).
+* Scans are weaker than text-layer PDFs: on 60 test scans, value accuracy is 93–97% (up from 72–81% in R11),
+  and what is returned is reliable (precision ≥ 0.95). The remaining gap is specific: on two-column reports,
+  the right-hand column's OCR call comes back incomplete on roughly 40% of attempts, while the left column is
+  always read correctly. See R12 in [eval/HISTORY.md](eval/HISTORY.md).
 * LH/FSH are judged against adult sex-specific ranges without cycle or menopause context.
 * The one-line summary is written by the LLM and is not verified claim by claim (the tags are); in the example above it
   says 高血壓 where the rules say 血壓偏高.
 * Advice quality depends on the knowledge base: about half of the advice is judged directly relevant. Bring a larger
   curated corpus in the same format (`data/kb_sample.README.md`) for richer advice.
 * The LOINC mapping is for interoperability demos; review it before any clinical use.
-* Planned: better row recovery for two-column and heavily degraded scans.
+* Planned: retry the right-half OCR call on two-column pages when it comes back thin.
 
 ## Data
 

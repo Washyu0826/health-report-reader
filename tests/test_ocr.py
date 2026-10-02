@@ -34,6 +34,49 @@ def test_table_cells_are_cleaned():
     assert ocr._rows_from_markup(html) == [["檢查項目", "結果", "參考值"], ["身高 Height", "158.0", ""]]
 
 
+def test_is_doublewide_true_for_two_merged_item_columns():
+    """Two independent item-name columns merged side by side (the twocol layout): a standalone
+    '項目' cell appears twice in one row."""
+    header = ["【一般體格檢查】", "項目", "結果", "参考值", "項目", "結果", "参考值"]
+    assert ocr._is_doublewide([header]) is True
+
+
+def test_is_doublewide_false_for_one_table_with_a_repeated_unit_column():
+    """R12 regression: a different, single-table layout prints '檢查項目/結果/單位' on the left and
+    that same table's '單位/參考值/判定' reference-range columns on the right — no second '項目' at
+    all. Splitting this one in half throws away the item name on the right half (orphaned
+    unit-only rows), which pushed scan false positives from 4/1/0 up to 12/12/7. Only a standalone
+    '項目' repeat (not '結果' or '單位') may trigger the split."""
+    merged = ["檢查項目", "結果", "單位", "單位", "參考值", "判定"]
+    assert ocr._is_doublewide([merged]) is False
+
+
+def test_doublewide_split_only_fires_for_merged_item_columns(monkeypatch):
+    """ocr_pdf splits into left/right crops when a row has '項目' twice, and leaves a single-table
+    page (repeated '單位' only) alone."""
+    doublewide_raw = ("<table><tr><th>項目</th><th>結果</th><th>項目</th><th>結果</th></tr>"
+                       "<tr><td>身高</td><td>158</td><td>體重</td><td>54</td></tr></table>")
+    single_table_raw = ("<table><tr><th>檢查項目</th><th>結果</th><th>單位</th>"
+                         "<th>單位</th><th>參考值</th><th>判定</th></tr>"
+                         "<tr><td>身高</td><td>158</td><td>cm</td><td>cm</td><td></td><td></td></tr></table>")
+    half_left = "<table><tr><th>項目</th><th>結果</th></tr><tr><td>身高</td><td>158</td></tr></table>"
+    half_right = "<table><tr><th>項目</th><th>結果</th></tr><tr><td>體重</td><td>54</td></tr></table>"
+
+    monkeypatch.setattr(ocr, "render_pages", lambda pdf_bytes: [b"page"])
+    monkeypatch.setattr(ocr, "_split_halves", lambda png: [b"left", b"right"])
+
+    calls = iter([half_left, half_right])
+    monkeypatch.setattr(ocr, "_ocr_page", lambda png, model, base_url: (
+        doublewide_raw if png == b"page" else next(calls)))
+    out = ocr.ocr_pdf(b"%PDF")
+    assert out["tables"] == [[["項目", "結果"], ["身高", "158"], ["項目", "結果"], ["體重", "54"]]]
+
+    monkeypatch.setattr(ocr, "_ocr_page", lambda png, model, base_url: single_table_raw)
+    out = ocr.ocr_pdf(b"%PDF")
+    assert out["tables"] == [[["檢查項目", "結果", "單位", "單位", "參考值", "判定"],
+                               ["身高", "158", "cm", "cm", "", ""]]]
+
+
 def test_text_outside_a_header_table_is_kept(monkeypatch):
     """A page that is a small header table plus plain lab lines (the 'plain' layout) used to lose
     every lab line: only the table rows were kept."""

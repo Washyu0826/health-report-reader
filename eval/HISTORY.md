@@ -150,3 +150,44 @@ invented ones: precision stays ≥ 0.95. The 5 remaining false positives come fr
 - `data/loinc_map.json` maps 122 of the 143 items (99 high, 23 medium confidence); 21 are left null on purpose.
 - Every code was checked ACTIVE in LOINC 2.82. The bundles validate against `fhir.resources`.
 - The Patient carries only gender; no header identity leaks (tested).
+
+## R12 — two-column scan row recovery (2026-10-03)
+
+**Diagnosis.** The two-column layout prints two independent 3-column item/value/range tables side by
+side per section. GLM-OCR reads the whole page as one wide table, and the left and right halves land
+at different, inconsistent cell offsets per row — the header row gets an extra leading cell the data
+rows don't have — which breaks header-aware column lookup downstream. That is the root cause of the
+R11 two-column weakness (72–77% of values read).
+
+**Fix** (`ocr.py`): detect the merged layout (a standalone `項目` cell appears twice in one row — the
+signature of two item-name columns merged side by side) and re-OCR that page as two overlapping
+half-width crops, where each half degrades to the already-reliable single-column case. Found and fixed
+along the way: `_rows_from_markup` previously stopped at the first markup style it found in a response
+(HTML *or* markdown), silently dropping a table written in the other style — a left-half crop can
+return HTML for the patient header and markdown for the lab tables in the same response.
+
+**First attempt used too broad a detector** (any of `項目`/`結果`/`參考值`/`單位`/`標記` repeated) and
+regressed: a different, single-table layout prints `檢查項目/結果/單位` on the left and that same
+table's own `單位/參考值/判定` reference-range columns on the right — no second `項目` at all.
+Splitting *that* layout in half throws away the item name on the right half, and the orphaned
+unit-only rows it leaves behind fed spurious matches: scan false positives rose from R11's 4/1/0 to
+12/12/7. Narrowing the detector to a standalone `項目` repeat only (confirmed unique to the merged
+two-column case) fixed it, with a regression test for both layouts (`tests/test_ocr.py`).
+
+**Result** (60 scans, same 20 reports and seed as R11):
+
+| Scan level | Abnormal F1 | Precision | Recall | Value accuracy |
+|---|---|---|---|---|
+| clean | 0.92 → **0.951** | 0.95 → 0.956 | — → 0.946 | 89% → 92.7% |
+| medium | 0.93 → **0.995** | 0.99 → 0.989 | — → 1.000 | 91% → 97.0% |
+| heavy | 0.91 → **0.983** | 1.00 → 1.000 | — → 0.967 | 81% → 93.2% |
+
+**Remaining weakness, found while checking this result:** the fix's two-column path is not fully
+reliable. Of 5 two-column samples in this run, the *right*-half crop's OCR response came back
+incomplete on roughly 6 of 15 report×level combinations — specific items from the right table
+(e.g. 收縮壓, 舒張壓, 脈搏, MCH, MCHC, 血小板, 白蛋白, 總蛋白, eGFR, 尿酸, HDL, LDL) go missing
+together, while the left half is consistently read correctly. This is not tied to scan quality (it
+happens at clean and heavy alike) and looks like model-side flakiness on that specific crop rather
+than a parsing bug; the aggregate numbers above already include these misses. Planned: retry the
+right-half OCR call once before accepting a thin result, and look at whether a tighter crop margin
+(less patient-header bleed into the right half) makes the response more consistent.
