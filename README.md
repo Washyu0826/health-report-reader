@@ -202,7 +202,7 @@ de-identified reports (not published).
 | R9 | leaner prompt; knowledge-base ablation | latency p50 17 s → **9 s** at equal quality; 57 targeted passages beat a generic corpus, but 152 passages did *worse*, so 57 stay |
 | R10 | LangGraph as the only orchestration path; nurse review; batch CLI | identical outputs to the hand-wired pipeline on 72 reports (deterministic fake LLM); with the real LLM every quality metric is unchanged and LangGraph adds 0.02 s per report |
 | R11 | OCR evaluation (60 scans, 3 quality levels) and fixes; FHIR export | scan abnormal F1 0.60–0.85 → **0.91–0.93**, false positives 55 → 5; FHIR R4 with LOINC codes for 122 of 143 items |
-| R12 | two-column scan row recovery: detect the merged layout, re-OCR as two half-width crops | scan abnormal F1 0.91–0.93 → **0.95–0.99**; found and fixed a header-merge false-positive regression along the way (12/12/7 → back to near 0) |
+| R12 | two-column scan row recovery: detect the merged layout, re-OCR as two half-width crops | scan abnormal F1 0.91–0.93 → **0.95–0.99**; found and fixed a header-merge false-positive regression along the way (false-positive rate briefly hit 35–60%, then back to near 0) |
 
 Release run (60 synthetic reports, R10): abnormal F1 0.991 (0 FP; all 5 misses are in one scanned PDF), condition F1
 0.95, risk F1 0.88, 85% of citations supported, advice directly relevant 49%, p50 9.6–10.5 s on an RTX 4060 Laptop GPU.

@@ -170,8 +170,9 @@ return HTML for the patient header and markdown for the lab tables in the same r
 regressed: a different, single-table layout prints `檢查項目/結果/單位` on the left and that same
 table's own `單位/參考值/判定` reference-range columns on the right — no second `項目` at all.
 Splitting *that* layout in half throws away the item name on the right half, and the orphaned
-unit-only rows it leaves behind fed spurious matches: scan false positives rose from R11's 4/1/0 to
-12/12/7. Narrowing the detector to a standalone `項目` repeat only (confirmed unique to the merged
+unit-only rows it leaves behind fed spurious matches: the scan false-positive rate rose from R11's
+20%/5%/0% to 60%/60%/35% (clean/medium/heavy, out of 20 reports each). Narrowing the detector to a
+standalone `項目` repeat only (confirmed unique to the merged
 two-column case) fixed it, with a regression test for both layouts (`tests/test_ocr.py`).
 
 **Result** (60 scans, same 20 reports and seed as R11):
